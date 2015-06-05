@@ -1,12 +1,12 @@
 #' Cull Backfaces
-#' 
+#'
 #' Cull the backfaces of a point cloud based on vertex normals.
 #' @export
 #' @examples
 #' cull.backfaces()
-#' 
+#'
 cull.backfaces <- function(){
-  sample <- read.table(file.choose(ch))
+  sample <- read.table(file.choose())
   znorm.pos <- sample$V6 >= 0
   src <- nrow(sample)
   rem <- sum(znorm.pos)
@@ -24,9 +24,9 @@ cull.backfaces <- function(){
     }
     setWinProgressBar(pb, value = r, label = pblab)
   }
-  
+
   close(pb)
-  
+
   points
-    
+
 }
