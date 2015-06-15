@@ -5,6 +5,7 @@
 #' @export
 
 align2 <- function(sample, filename) {
+  library(stringr)
   # start time for calculating run time
   starttime <- Sys.time()
 
@@ -72,7 +73,7 @@ align2 <- function(sample, filename) {
 
   # saving as a txt file
   setWinProgressBar(pb, 8, label = "Writing to file...")
-  fullfile <- paste(filename, "-results", ".xyz", sep = "")
+  fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   write.table(finish, file = fullfile, row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
@@ -84,8 +85,9 @@ align2 <- function(sample, filename) {
 
   # calculating run time
   endtime <- Sys.time()
+  runtime <- difftime(endtime, starttime, units = "mins")
 
   # returning results
-  returnlist <- list("saved as" = fullfile, "runtime" = endtime - starttime, "loops" = l, "adjustment made" = changemade)
-  print(returnlist)
+  returnlist <- data.frame("saved.as" = fullfile, "runtime" = paste(round(runtime), "mins"), "loops" = l, "x.diff" = as.integer(unlist(strsplit(changemade[1], " "))[6]), "y.diff" = as.integer(unlist(strsplit(changemade[2], " "))[6]), "z.diff" = as.integer(unlist(strsplit(changemade[3], " "))[6]))
+  assign("returnlist", returnlist, envir = parent.frame())
 }

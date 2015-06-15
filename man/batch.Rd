@@ -4,7 +4,7 @@
 \alias{batch}
 \title{Batch import and align}
 \usage{
-batch()
+batch(align = TRUE, backface = FALSE)
 }
 \description{
 Calls align2 (and thus various other functions) in order to import and align a series of.xyz files. Files must be 3 columns (x, y, z) with no normals.
