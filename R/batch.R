@@ -38,7 +38,7 @@ batch <- function(align = TRUE, backface = FALSE){
     pblab <- paste("Importing ", i, " of ", nfiles, ".", " Estimated time remaining: ", eta, " minutes.")
     setWinProgressBar(pb, i, label = pblab)
     noext <- sapply(strsplit(basename(filelist[i]), "\\."), function(x) paste(x[1:(length(x)-1)]))
-    objname <- gsub("[^[:alnum:]]", "", noext)
+    objname <- paste("m", gsub("[^[:alnum:]]", "", noext), sep = "")
     vertname <- paste(objname, "VERT", sep = "")
     normname <- paste (objname, "NORM", sep = "")
 
@@ -106,9 +106,9 @@ batch <- function(align = TRUE, backface = FALSE){
     resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
     resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
     }
+  print(resFrame)
   }
 
   endTime <- Sys.time()
   print(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minutes.", sep = " "))
-  print(resFrame)
 }
