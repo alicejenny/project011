@@ -49,7 +49,7 @@ yztransform <- function(sample){
   le <- data.frame("y" = c(hf$y[m], hf$y[m+1]), "z" = c(hf$z[m], hf$z[m+1]))
 
   # right way up
-  if (le$z[2] < 0){
+  if (le$z[1] && le$z[2] < 0){
     yzt.r <- data.frame("x" = sample$x, "y" = (yzt.r$y * cos(pi)) - (yzt.r$z * sin(pi)), "z" = (yzt.r$y * sin(pi)) + (yzt.r$z * cos(pi)))
   }
 
