@@ -10,7 +10,7 @@ align2 <- function(sample, filename) {
   starttime <- Sys.time()
 
   # progress bar
-  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 9)
+  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 10)
 
   # initial plots
   par(mfrow=c(2,3))
@@ -53,12 +53,12 @@ align2 <- function(sample, filename) {
     xytransform.res <- centre(xytransform.res)
 
     # yz align
-    setWinProgressBar(pb, 5, label = "Aligning YZ...")
+    setWinProgressBar(pb, 6, label = "Aligning YZ...")
     yzalign.res <- yzalign(xytransform.res)
     yzalign.res <- centre(yzalign.res)
 
     # xz transform
-    setWinProgressBar(pb, 6, label = "Transforming XZ...")
+    setWinProgressBar(pb, 7, label = "Transforming XZ...")
     xztransform.res <- xztransform(yzalign.res)
     xztransform.res <- centre(xztransform.res)
 
@@ -66,18 +66,18 @@ align2 <- function(sample, filename) {
   }
 
   #plotting graphs
-  setWinProgressBar(pb, 7, label = "Transforming XZ...")
+  setWinProgressBar(pb, 8, label = "Plotting graphs...")
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = "finish xy", asp = 1)
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = "finish yz", asp = 1)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = "finish xz", asp = 1)
 
   # saving as a txt file
-  setWinProgressBar(pb, 8, label = "Writing to file...")
+  setWinProgressBar(pb, 9, label = "Writing to file...")
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   write.table(finish, file = fullfile, row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
-  setWinProgressBar(pb, 9)
+  setWinProgressBar(pb, 10)
   close(pb)
 
   # calculating change made

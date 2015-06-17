@@ -27,8 +27,29 @@ yztransform <- function(sample){
     yzt.r <- data.frame("x" = sample$x, "y" = (yzt.r$y * cos(pi/2)) - (yzt.r$z * sin(pi/2)), "z" = (yzt.r$y * sin(pi/2)) + (yzt.r$z * cos(pi/2)))
   }
 
+  # finding the longest edge
+  hpts <- chull(x = yzt.r$y, y = yzt.r$z)
+  hf <- data.frame("y" = yzt.r$y[hpts], "z" = yzt.r$z[hpts])
+  npts <- nrow(hf)
+  dist <- c(numeric(npts))
+  for (i in 1:npts){
+    if (i != npts){
+      a <- abs(hf$y[i] - hf$y[i+1])
+      b <- abs(hf$z[i] - hf$z[i+1])
+    }
+    else {
+      a <- abs(hf$y[i] - hf$y[1])
+      b <- abs(hf$z[i] - hf$z[1])
+    }
+    c2 <- (a^2) + (b^2)
+    c <- sqrt(c2)
+    dist[i] <- c
+  }
+  m <- which.max(dist)
+  le <- data.frame("y" = c(hf$y[m], hf$y[m+1]), "z" = c(hf$z[m], hf$z[m+1]))
+
   # right way up
-  if (yzt.r$y[which.max(yzt.r$z)] > 0){
+  if (le$z[2] < 0){
     yzt.r <- data.frame("x" = sample$x, "y" = (yzt.r$y * cos(pi)) - (yzt.r$z * sin(pi)), "z" = (yzt.r$y * sin(pi)) + (yzt.r$z * cos(pi)))
   }
 
