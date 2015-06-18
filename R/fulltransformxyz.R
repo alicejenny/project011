@@ -4,7 +4,7 @@
 #' @param sample The input data frame. 3 columns (x, y, and z, in that order).
 #' @export
 
-align2 <- function(sample, filename) {
+align2 <- function(sample, filename, folder) {
   library(stringr)
   # start time for calculating run time
   starttime <- Sys.time()
@@ -82,10 +82,10 @@ align2 <- function(sample, filename) {
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish xz", sep = " "), asp = 1)
 
-  # saving as a txt file
+  # saving as an xyz file
   setWinProgressBar(pb, 9, label = "Writing to file...")
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
-  write.table(finish, file = fullfile, row.names = FALSE, col.names = FALSE)
+  write.table(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
   setWinProgressBar(pb, 10)

@@ -93,20 +93,24 @@ batch <- function(align = TRUE, backface = FALSE){
   }
 
   if (align == TRUE){
-  impfiles <- ls(vertenv)
-  resFrame <- data.frame("saved.as" = numeric(length(impfiles)), "runtime" = numeric(length(impfiles)), "loops" = numeric(length(impfiles)), "x.diff" = numeric(length(impfiles)), "y.diff" = numeric(length(impfiles)), "z.diff" = numeric(length(impfiles)))
-  for (i in 1:length(impfiles)){
-    obj <- get(impfiles[i], envir = vertenv)
-    fn <- impfiles[i]
-    align2(sample = obj, filename = fn)
-    resFrame$saved.as[i] <- as.character(returnlist$saved.as[1])
-    resFrame$runtime[i] <- as.character(returnlist$runtime[1])
-    resFrame$loops[i] <- as.integer(returnlist$loops[1])
-    resFrame$x.diff[i] <- as.integer(returnlist$x.diff[1])
-    resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
-    resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
+
+    savedir <- choose.dir()
+    impfiles <- ls(vertenv)
+    resFrame <- data.frame("saved.as" = numeric(length(impfiles)), "runtime" = numeric(length(impfiles)), "loops" = numeric(length(impfiles)), "x.diff" = numeric(length(impfiles)), "y.diff" = numeric(length(impfiles)), "z.diff" = numeric(length(impfiles)))
+
+    for (i in 1:length(impfiles)){
+      obj <- get(impfiles[i], envir = vertenv)
+      fn <- impfiles[i]
+      align2(sample = obj, filename = fn, folder = savedir)
+      resFrame$saved.as[i] <- as.character(returnlist$saved.as[1])
+      resFrame$runtime[i] <- as.character(returnlist$runtime[1])
+      resFrame$loops[i] <- as.integer(returnlist$loops[1])
+      resFrame$x.diff[i] <- as.integer(returnlist$x.diff[1])
+      resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
+      resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
     }
-  print(resFrame)
+
+    print(resFrame)
   }
 
   endTime <- Sys.time()
