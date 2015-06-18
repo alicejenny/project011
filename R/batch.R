@@ -96,9 +96,9 @@ batch <- function(align = TRUE, backface = FALSE){
   impfiles <- ls(vertenv)
   resFrame <- data.frame("saved.as" = numeric(length(impfiles)), "runtime" = numeric(length(impfiles)), "loops" = numeric(length(impfiles)), "x.diff" = numeric(length(impfiles)), "y.diff" = numeric(length(impfiles)), "z.diff" = numeric(length(impfiles)))
   for (i in 1:length(impfiles)){
-    fn <- as.character(substitute(impfiles[i]))
-    obj <-  get(impfiles[i], envir = vertenv)
-    align2(sample = obj, filename = fn[2])
+    obj <- get(impfiles[i], envir = vertenv)
+    fn <- impfiles[i]
+    align2(sample = obj, filename = fn)
     resFrame$saved.as[i] <- as.character(returnlist$saved.as[1])
     resFrame$runtime[i] <- as.character(returnlist$runtime[1])
     resFrame$loops[i] <- as.integer(returnlist$loops[1])
