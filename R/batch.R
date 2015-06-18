@@ -110,5 +110,5 @@ batch <- function(align = TRUE, backface = FALSE){
   }
 
   endTime <- Sys.time()
-  print(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minutes.", sep = " "))
+  print(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minute(s).", sep = " "))
 }

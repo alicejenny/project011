@@ -14,9 +14,9 @@ align2 <- function(sample, filename) {
 
   # initial plots
   par(mfrow=c(2,3))
-  plot(sample$x, sample$y, xlab = "x", ylab = "y", main = "start xy", asp = 1)
-  plot(sample$y, sample$z, xlab = "y", ylab = "z", main = "start yz", asp = 1)
-  plot(sample$x, sample$z, xlab = "x", ylab = "z", main = "start xz", asp = 1)
+  plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
+  plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
+  plot(sample$x, sample$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start xz", sep = " "), asp = 1)
 
   #empty objects
   src <- nrow(sample)
@@ -63,13 +63,24 @@ align2 <- function(sample, filename) {
     xztransform.res <- centre(xztransform.res)
 
     finish <- xztransform.res
+
+    if (l == 200){
+      print("Maximum loops reached. Aligning process terminated.")
+      break
+    }
+  }
+
+  # rotating so chin is down
+  xmax.y <- finish$y[which.max(finish$x)]
+  if (xmax.y < 0){
+    finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
   }
 
   #plotting graphs
   setWinProgressBar(pb, 8, label = "Plotting graphs...")
-  plot(finish$x, finish$y, xlab = "x", ylab = "y", main = "finish xy", asp = 1)
-  plot(finish$y, finish$z, xlab = "y", ylab = "z", main = "finish yz", asp = 1)
-  plot(finish$x, finish$z, xlab = "x", ylab = "z", main = "finish xz", asp = 1)
+  plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "finish xy", sep = " "), asp = 1)
+  plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
+  plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish xz", sep = " "), asp = 1)
 
   # saving as a txt file
   setWinProgressBar(pb, 9, label = "Writing to file...")
@@ -85,9 +96,15 @@ align2 <- function(sample, filename) {
 
   # calculating run time
   endtime <- Sys.time()
-  runtime <- difftime(endtime, starttime, units = "mins")
+  runtime <- round(difftime(endtime, starttime, units = "mins"))
+  if (runtime < 2){
+    minunit <- "minute"
+  }
+  if (runtime >= 2) {
+    minunit <- "minutes"
+  }
 
   # returning results
-  returnlist <- data.frame("saved.as" = fullfile, "runtime" = paste(round(runtime), "mins"), "loops" = l, "x.diff" = as.integer(unlist(strsplit(changemade[1], " "))[6]), "y.diff" = as.integer(unlist(strsplit(changemade[2], " "))[6]), "z.diff" = as.integer(unlist(strsplit(changemade[3], " "))[6]))
+  returnlist <- data.frame("saved.as" = fullfile, "runtime" = runtime, "loops" = l, "x.diff" = as.integer(unlist(strsplit(changemade[1], " "))[6]), "y.diff" = as.integer(unlist(strsplit(changemade[2], " "))[6]), "z.diff" = as.integer(unlist(strsplit(changemade[3], " "))[6]))
   assign("returnlist", returnlist, envir = parent.frame())
 }
