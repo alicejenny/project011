@@ -87,6 +87,9 @@ align2 <- function(sample, filename, folder) {
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   write.table(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
 
+  #returning to parent environment
+  assign(fullfile, finish, envir = .GlobalEnv)
+
   # closing progress bar
   setWinProgressBar(pb, 10)
   close(pb)
