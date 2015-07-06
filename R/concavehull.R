@@ -22,9 +22,9 @@ concavehull <- function(sample, k = 3){
   dataset <- subset(dataset, x != firstPoint$x[1] & y != firstPoint$y[1])
   step <- 0
   pcdist <- 1
-  pcx <- -1
-  pcy <- 0
   continue <- TRUE
+  previousPoint <- data.frame("x" = firstPoint$x[1]-1, "y" = firstPoint$y[1])
+  plot(dataset, asp = 1)
 
   while (continue == TRUE){
     if (step == 5){
@@ -45,8 +45,16 @@ concavehull <- function(sample, k = 3){
       for (i in 1:kk) {
         ccx <- kNearestPoints[i,1] - currentPoint[1,1]
         ccy <- kNearestPoints[i,2] - currentPoint[1,2]
+        pcx <- previousPoint$x[1] - currentPoint$x[1]
+        pcy <- previousPoint$y[1] - currentPoint$y[1]
         rad <- abs(atan2(ccy,ccx) - atan2(pcy,pcx))
         deg <-  rad * (180/pi)
+        if (((pcx*ccy) - (pcy*ccx) > 0) & deg < 180){
+          deg <- 360 - deg
+        }
+        if (((pcx*ccy) - (pcy*ccx) <= 0) & deg > 180){
+          deg <- 360 - deg
+        }
         knn.angle[,i] <- deg
       }
 
@@ -54,17 +62,12 @@ concavehull <- function(sample, k = 3){
       knn.angle.sorted <- data.frame("deg" = c(knn.angle), "x" = c(kNearestPoints[,1]), "y" = c(kNearestPoints[,2]), "dist" = c(knn.dist))
       knn.angle.sorted <- knn.angle.sorted[ order(-knn.angle.sorted$deg, knn.angle.sorted$x, knn.angle.sorted$y, knn.angle.sorted$dist), ]
       cPoints <- data.frame("x" = knn.angle.sorted$x, "y" = knn.angle.sorted$y)
-      print(knn.angle.sorted)
-      plot(sample2)
-      points(cPoints, col = "green")
-      points(currentPoint, col = "red")
-      points(pcx, pcy, col = "orange")
-      text(cPoints$x, cPoints$y, round(knn.angle.sorted$deg), cex = 0.7, pos = 3)
 
       # if it's the first point, select the top one
       if (nrow(hull) == 1){
         hull <- rbind(hull, cPoints[1,])
         its <- FALSE
+        previousPoint <- currentPoint
         currentPoint <- cPoints[1,]
       }
 
@@ -77,7 +80,7 @@ concavehull <- function(sample, k = 3){
           itslog <- c(numeric(nrow(hull)-1))
           for (j in 1:(nrow(hull)-1)) {
             line2 <- rbind(hull[j,],hull[j+1,])
-            itslog[j] <- intersects(ccline, line2, FALSE)
+            itslog[j] <- intersects(ccline, line2, TRUE)
           }
           if (sum(itslog) == 0){
             its <- FALSE
@@ -86,13 +89,12 @@ concavehull <- function(sample, k = 3){
         # if a valid candidate was found
         if (its == FALSE){
           hull <- rbind(hull, cPoints[i,])
-          pcx <- currentPoint$x[i]
-          pcy <- currentPoint$y[i]
           kk <- max(c(k, 3))
           kk <- min(c(kk, nrow(dataset) - 1))
+          previousPoint <- currentPoint
           currentPoint <- cPoints[i,]
-          print("valid candidate found:")
-          print(currentPoint)
+          pcx <- currentPoint$x[1] - previousPoint$x[1]
+          pcy <- currentPoint$y[1] - previousPoint$y[1]
           lines(hull, col = "blue")
         }
 
@@ -114,6 +116,5 @@ concavehull <- function(sample, k = 3){
   if ((nrow(sample) - sum(pnt.in.poly(sample, hull)[,3])) == 0){
     print("all points are inside the polygon!")
   }
-  plot(sample2)
   lines(hull, col = "red")
 }

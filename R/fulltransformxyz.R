@@ -76,6 +76,19 @@ align2 <- function(sample, filename, folder) {
     finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
   }
 
+  # find yz base slope
+  loweredge <- findbase(finish)
+  slp <- diff(loweredge$y)/diff(loweredge$z)
+  rad <- pi/2 - atan(slp)
+
+  # if rad = NA
+  if (is.na(rad)){
+    rad <- 0
+  }
+
+  # rotating to flatten base
+  finish <- data.frame("x" = finish$x, "y" = (finish$y * cos(rad)) - (finish$z * sin(rad)), "z" = (finish$y * sin(rad)) + (finish$z * cos(rad)))
+
   #plotting graphs
   setWinProgressBar(pb, 8, label = "Plotting graphs...")
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "finish xy", sep = " "), asp = 1)
