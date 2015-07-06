@@ -15,6 +15,6 @@ baseslice <- function(sample, filename, folder){
   sixcol <- cbind(flipped, normdf)
   culled <- subset(sixcol, zn < 0)
   finish <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
-  fullfile <- paste(globname, ".txt", sep = "")
+  fullfile <- paste(globname, ".xyz", sep = "")
   write.table(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
 }
