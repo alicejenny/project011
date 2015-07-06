@@ -4,10 +4,10 @@
 \alias{batch}
 \title{Batch import and align}
 \usage{
-batch(align = TRUE, backface = FALSE)
+batch(align = TRUE, slice = TRUE)
 }
 \description{
-Calls align2 (and thus various other functions) in order to import and align a series of.xyz files. Files must be 3 columns (x, y, z) with no normals.
+Calls align2 (and thus various other functions) in order to import and align a series of.xyz files. Files must be 6 columns until I have the time to change it.
 Will be updated later to include other functions/make it run a bit better.
 No variables needed (see example).
 }

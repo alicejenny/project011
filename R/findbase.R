@@ -1,3 +1,8 @@
+#' Find base
+#'
+#' Finds the five longest edges of the convex hull and estimates which one is the base. Returns a data frame.
+#' @export
+
 findbase <- function(sample){
   # calculating convex hull edge lengths
   hpts <- chull(x = sample$y, y = sample$z)

@@ -1,3 +1,8 @@
+#' Isolate the base
+#'
+#' Slices off the base (xmin + 10%), inverts it, and culls backfaces. Saves as a txt.
+#' @export
+
 baseslice <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
