@@ -4,7 +4,7 @@
 #' @param sample The input data frame. 3 columns (x, y, and z, in that order).
 #' @export
 
-align2 <- function(sample, filename, folder) {
+align2 <- function(sample, filename, folder, slice = TRUE) {
   library(stringr)
   require(openxlsx)
   # start time for calculating run time
@@ -75,6 +75,20 @@ align2 <- function(sample, filename, folder) {
   xmax.y <- finish$y[which.max(finish$x)]
   if (xmax.y < 0){
     finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
+  }
+
+  # slicing
+  if (slice == TRUE){
+    baseslice(finish, filename, folder)
+    lrflip(finish, filename, folder)
+
+    leftside <- subset(finish, x > 0)
+    rightside <- subset(finish, x < 0)
+    lfn <- str_replace(filename, "VERT", "LVERT")
+    rfn <- str_replace(filename, "VERT", "RVERT")
+
+    ramusslice(leftside, lfn, folder)
+    ramusslice(rightside, rfn, folder)
   }
 
   #plotting graphs

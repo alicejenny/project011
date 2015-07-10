@@ -7,7 +7,7 @@
 #' @examples batch()
 
 batch <- function(align = TRUE, slice = TRUE){
-  if (align == TRUE){
+  if (align == FALSE){
     slice <- FALSE
   }
 # Selecting the files
@@ -16,7 +16,7 @@ batch <- function(align = TRUE, slice = TRUE){
   nfiles <- length(filelist)
   startTime <- Sys.time()
   startmsg <- paste("WARNING: This could take a while. There are", nfiles, "files to process.", sep = " ")
-  cat(startmsg)
+  cat(startmsg, "/n")
 
 # Empty objects
   errorlist <- c()
@@ -75,7 +75,7 @@ batch <- function(align = TRUE, slice = TRUE){
   }
 
   close(pb)
-  cat("\n", "File import complete.")
+  cat("File import complete.", "/n")
 
 # Printing the error list
   if (length(errorlist) != 0){
@@ -91,25 +91,13 @@ batch <- function(align = TRUE, slice = TRUE){
     for (i in 1:length(impfiles)){
       obj <- get(impfiles[i], envir = vertenv)
       fn <- impfiles[i]
-      align2(sample = obj, filename = fn, folder = savedir)
+      align2(sample = obj, filename = fn, folder = savedir, slice = slice)
       resFrame$saved.as[i] <- as.character(returnlist$saved.as[1])
       resFrame$runtime[i] <- as.character(returnlist$runtime[1])
       resFrame$loops[i] <- as.integer(returnlist$loops[1])
       resFrame$x.diff[i] <- as.integer(returnlist$x.diff[1])
       resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
       resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
-      if (slice == TRUE){
-        baseslice(obj, fn, savedir)
-        lrflip(obj, fn, savedir)
-
-        leftside <- subset(obj, x > 0)
-        rightside <- subset(obj, x < 0)
-        lfn <- str_replace(filename, "VERT", "LVERT")
-        rfn <- str_replace(filename, "VERT", "RVERT")
-
-        ramusslice(leftside, lfn, savedir)
-        ramusslice(rightside, rfn, savedir)
-      }
     }
 
     print(resFrame)
