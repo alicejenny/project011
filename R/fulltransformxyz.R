@@ -6,6 +6,7 @@
 
 align2 <- function(sample, filename, folder) {
   library(stringr)
+  require(xlsx)
   # start time for calculating run time
   starttime <- Sys.time()
 
@@ -80,16 +81,17 @@ align2 <- function(sample, filename, folder) {
   setWinProgressBar(pb, 8, label = "Plotting graphs...")
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "finish xy", sep = " "), asp = 1)
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
+  edgelength(finish$y, finish$z)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish xz", sep = " "), asp = 1)
-
-  # saving as an xyz file
-  setWinProgressBar(pb, 9, label = "Writing to file...")
-  fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
-  write.xlsx(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
 
   #returning to global environment
   globname <- str_replace(filename, "VERT", ".al")
   assign(globname, finish, envir = .GlobalEnv)
+
+  # saving as an xyz file
+  setWinProgressBar(pb, 9, label = "Writing to file...")
+  fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xlsx", sep = "")
+  write.xlsx(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
   setWinProgressBar(pb, 10)

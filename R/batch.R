@@ -16,7 +16,7 @@ batch <- function(align = TRUE, slice = TRUE){
   nfiles <- length(filelist)
   startTime <- Sys.time()
   startmsg <- paste("WARNING: This could take a while. There are", nfiles, "files to process.", sep = " ")
-  print(startmsg)
+  cat(startmsg)
 
 # Empty objects
   errorlist <- c()
@@ -75,7 +75,7 @@ batch <- function(align = TRUE, slice = TRUE){
   }
 
   close(pb)
-  print("File import complete.")
+  cat("File import complete.")
 
 # Printing the error list
   if (length(errorlist) != 0){
@@ -84,7 +84,7 @@ batch <- function(align = TRUE, slice = TRUE){
 
   if (align == TRUE){
 
-    savedir <- choose.dir(caption = "Select Save Folder")
+    savedir <- choose.dir(default = getwd(), caption = "Select Save Folder")
     impfiles <- ls(vertenv)
     resFrame <- data.frame("saved.as" = numeric(length(impfiles)), "runtime" = numeric(length(impfiles)), "loops" = numeric(length(impfiles)), "x.diff" = numeric(length(impfiles)), "y.diff" = numeric(length(impfiles)), "z.diff" = numeric(length(impfiles)))
 
@@ -108,5 +108,5 @@ batch <- function(align = TRUE, slice = TRUE){
   }
 
   endTime <- Sys.time()
-  print(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minute(s).", sep = " "))
+  cat(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minute(s).", sep = " "))
 }
