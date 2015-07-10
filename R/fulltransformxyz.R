@@ -6,7 +6,7 @@
 
 align2 <- function(sample, filename, folder) {
   library(stringr)
-  require(xlsx)
+  require(XLConnect)
   # start time for calculating run time
   starttime <- Sys.time()
 
@@ -91,7 +91,14 @@ align2 <- function(sample, filename, folder) {
   # saving as an xyz file
   setWinProgressBar(pb, 9, label = "Writing to file...")
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xlsx", sep = "")
-  write.xlsx(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
+  fileandpath <- paste(folder, fullfile, sep = "//")
+  if (file.exists(fileandpath) == TRUE){
+    file.remove(fileandpath)
+  }
+  wb <- loadWorkbook(fileandpath, create = TRUE)
+  createSheet(wb, name = globname)
+  writeWorksheet(wb, finish, sheet = globname, header = FALSE, rownames = NULL)
+  saveWorkbook(wb)
 
   # closing progress bar
   setWinProgressBar(pb, 10)
