@@ -101,7 +101,14 @@ batch <- function(align = TRUE, slice = TRUE){
       if (slice == TRUE){
         baseslice(obj, fn, savedir)
         lrflip(obj, fn, savedir)
-        ramusslice(obj, fn, savedir)
+
+        leftside <- subset(obj, x > 0)
+        rightside <- subset(obj, x < 0)
+        lfn <- str_replace(filename, "VERT", "LVERT")
+        rfn <- str_replace(filename, "VERT", "RVERT")
+
+        ramusslice(leftside, lfn, savedir)
+        ramusslice(rightside, rfn, savedir)
       }
     }
 
