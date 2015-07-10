@@ -6,4 +6,4 @@ Description: Various functions used in the author's MSc thesis project about 3D 
 Depends: R (>= 3.2.0)
 License: Creative Commons Attribution 4.0 International License
 LazyData: true
-Imports: stringr, xlsx, rJava, Morpho, Rvcg
+Imports: stringr, openxlsx, rJava, Morpho, Rvcg
