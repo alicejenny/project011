@@ -104,15 +104,9 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
 
   # saving as an xyz file
   setWinProgressBar(pb, 9, label = "Writing to file...")
-  fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xlsx", sep = "")
+  fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
-  if (file.exists(fileandpath) == TRUE){
-    file.remove(fileandpath)
-    }
-  wb <- createWorkbook()
-  addWorksheet(wb, globname)
-  writeData(wb, globname, finish, colNames = FALSE, rowNames = FALSE)
-  saveWorkbook(wb, fileandpath, overwrite = TRUE)
+  write.table(finish, fileandpath, row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
   setWinProgressBar(pb, 10)
