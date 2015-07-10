@@ -4,6 +4,7 @@
 #' @export
 #'
 edgelength <- function(sample){
+  start <- Sys.time()
   # finding the longest edge
   hpts <- chull(x = sample$y, y = sample$z)
   hf <- data.frame("y" = sample$y[hpts], "z" = sample$z[hpts])
@@ -66,4 +67,8 @@ edgelength <- function(sample){
   minz <- which.min(topfivep1$z)
   base <- rbind(topfivep1[minz,],topfivep2[minz,])
   lines(base, col = "purple")
+
+  end <- Sys.time()
+
+  end - start
 }

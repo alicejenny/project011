@@ -85,7 +85,7 @@ align2 <- function(sample, filename, folder) {
   # saving as an xyz file
   setWinProgressBar(pb, 9, label = "Writing to file...")
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
-  write.table(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
+  write.xlsx(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
 
   #returning to global environment
   globname <- str_replace(filename, "VERT", ".al")

@@ -2,7 +2,8 @@ Package: project011
 Title: project011 functions
 Version: 0.2
 Authors@R: person("Alice Jenny", "Butcher", email = "alice@butcher.name", role = c("aut", "cre"))
-Description: For transforming point clouds of laser-scanned mandibles into a standard orientation.
+Description: Various functions used in the author's MSc thesis project about 3D point clouds of mandibles.
 Depends: R (>= 3.2.0)
 License: Creative Commons Attribution 4.0 International License
 LazyData: true
+Imports: stringr, xlsx, rJava, Morpho, Rvcg
