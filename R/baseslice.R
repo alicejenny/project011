@@ -25,6 +25,6 @@ baseslice <- function(sample, filename, folder){
   }
   wb <- createWorkbook()
   addWorksheet(wb, shortname)
-  writeData(wb, shortname, finish, colNames = FALSE, rowNames = FALSE)
+  writeData(wb, shortname, finish, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 }

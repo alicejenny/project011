@@ -41,7 +41,7 @@ lrflip <- function(sample, filename, folder) {
   }
   wb <- createWorkbook()
   addWorksheet(wb, shortname)
-  writeData(wb, shortname, leftside, colNames = FALSE, rowNames = FALSE)
+  writeData(wb, shortname, leftside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
   # save right
@@ -53,6 +53,6 @@ lrflip <- function(sample, filename, folder) {
   }
   wb <- createWorkbook()
   addWorksheet(wb, shortname)
-  writeData(wb, shortname, rightside, colNames = FALSE, rowNames = FALSE)
+  writeData(wb, shortname, rightside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 }
