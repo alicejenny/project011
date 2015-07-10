@@ -9,3 +9,6 @@ Other exciting features to come:
 - automatic slicing, orienting, and backface culling, ready for import into ArcGIS
 - batch everything; just put in a load of .xyz files and wait
 - even more sarcasm, despair, and unnecessary sleepless nights!
+
+Please note:
+- this project is INCREDIBLY messy (this will be fixed at some point)
