@@ -4,7 +4,7 @@
 \alias{lrsplit}
 \title{Left-Right Split}
 \usage{
-lrsplit(sample, filename, folder)
+lrsplit(sample, filename)
 }
 \arguments{
 \item{sample}{The input data frame. 3 named columns (x, y, and z, in that order).}

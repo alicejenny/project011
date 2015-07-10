@@ -32,11 +32,27 @@ lrflip <- function(sample, filename, folder) {
   rculled <- subset(rsixcol, zn < 0)
   rightside <- data.frame("x" = rculled$x, "y" = rculled$y, "z" = rculled$z)
 
-  # save
-  lname <- str_replace(filename, "VERT", ".l")
-  rname <- str_replace(filename, "VERT", ".r")
-  lfullfile <- paste(lname, ".txt", sep = "")
-  rfullfile <- paste(rname, ".txt", sep = "")
-  write.table(leftside, file = paste(folder, lfullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
-  write.table(rightside, file = paste(folder, rfullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
+  # save left
+  shortname <- str_replace(filename, "VERT", "-left")
+  fullfile <- paste(shortname, ".xlsx", sep = "")
+  fileandpath <- paste(folder, fullfile, sep = "//")
+  if (file.exists(fileandpath) == TRUE){
+    file.remove(fileandpath)
+  }
+  wb <- createWorkbook()
+  addWorksheet(wb, shortname)
+  writeData(wb, shortname, leftside, colNames = FALSE, rowNames = FALSE)
+  saveWorkbook(wb, fileandpath, overwrite = TRUE)
+
+  # save right
+  shortname <- str_replace(filename, "VERT", "-right")
+  fullfile <- paste(shortname, ".xlsx", sep = "")
+  fileandpath <- paste(folder, fullfile, sep = "//")
+  if (file.exists(fileandpath) == TRUE){
+    file.remove(fileandpath)
+  }
+  wb <- createWorkbook()
+  addWorksheet(wb, shortname)
+  writeData(wb, shortname, rightside, colNames = FALSE, rowNames = FALSE)
+  saveWorkbook(wb, fileandpath, overwrite = TRUE)
 }

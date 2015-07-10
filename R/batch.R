@@ -75,7 +75,7 @@ batch <- function(align = TRUE, slice = TRUE){
   }
 
   close(pb)
-  cat("File import complete.")
+  cat("\n", "File import complete.")
 
 # Printing the error list
   if (length(errorlist) != 0){
@@ -99,8 +99,9 @@ batch <- function(align = TRUE, slice = TRUE){
       resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
       resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
       if (slice == TRUE){
-        baseslice(sample = obj, filename = fn, folder = savedir)
-        lrflip(sample = obj, filename = fn, folder = savedir)
+        baseslice(obj, fn, savedir)
+        lrflip(obj, fn, savedir)
+        ramusslice(obj, fn, savedir)
       }
     }
 

@@ -15,6 +15,16 @@ baseslice <- function(sample, filename, folder){
   sixcol <- cbind(flipped, normdf)
   culled <- subset(sixcol, zn < 0)
   finish <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
-  fullfile <- paste(globname, ".xyz", sep = "")
-  write.table(finish, file = paste(folder, fullfile, sep = "/"), row.names = FALSE, col.names = FALSE)
+
+  # saving
+  shortname <- str_replace(filename, "VERT", "-base")
+  fullfile <- paste(shortname, ".xlsx", sep = "")
+  fileandpath <- paste(folder, fullfile, sep = "//")
+  if (file.exists(fileandpath) == TRUE){
+    file.remove(fileandpath)
+  }
+  wb <- createWorkbook()
+  addWorksheet(wb, shortname)
+  writeData(wb, shortname, finish, colNames = FALSE, rowNames = FALSE)
+  saveWorkbook(wb, fileandpath, overwrite = TRUE)
 }

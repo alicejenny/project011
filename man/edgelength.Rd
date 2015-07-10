@@ -4,9 +4,9 @@
 \alias{edgelength}
 \title{Finding the five longest edges}
 \usage{
-edgelength(sample)
+edgelength(x, y)
 }
 \description{
-Finds and plots (on a pre-existing graph) the five longest edges of the convex hull on the yz axes.
+Finds and plots (on a pre-existing graph) the five longest edges of the convex hull.
 }
 
