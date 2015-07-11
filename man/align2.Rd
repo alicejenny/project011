@@ -4,7 +4,7 @@
 \alias{align2}
 \title{Align Mandible}
 \usage{
-align2(sample, filename, folder)
+align2(sample, filename, folder, slice = TRUE)
 }
 \arguments{
 \item{sample}{The input data frame. 3 columns (x, y, and z, in that order).}

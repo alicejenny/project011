@@ -2,7 +2,7 @@
 % Please edit documentation in R/ramusslice.R
 \name{ramusslice}
 \alias{ramusslice}
-\title{Ramus Slice}
+\title{Posterior Ramus Slice}
 \usage{
 ramusslice(sample, filename, folder)
 }
