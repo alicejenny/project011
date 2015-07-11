@@ -1,10 +1,10 @@
-#' Ramus Slice
+#' Gonial Area Slice
 #'
-#' Isolates the ramus, flips to horizontal, and culls backfaces.
+#' Isolates the gonial area, flips to horizontal, and culls backfaces (in a weird glitchy kind of way).
 #' @param sample The input data frame. 3 named columns (x, y, and z, in that order).
 #' @export
 
-wholeramus <- function(sample, filename, folder){
+gonialarea <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
 
@@ -139,15 +139,24 @@ wholeramus <- function(sample, filename, folder){
   rad <- pi*2 - atan(slp)
   leftside <- data.frame("x" = (leftside$x * cos(rad)) - (leftside$z * sin(rad)), "y" = leftside$y, "z" = (leftside$x * sin(rad)) + (leftside$z * cos(rad)))
 
-  # cull backfaces (left)
-  leftside <- subset(leftside, z > leftside$z[which.max(leftside$x)])
+  minpoint <- min(c(leftside$z[which.max(leftside$y)], leftside$z[which.max(leftside$x)]))
+  leftside <- subset(leftside, z > minpoint)
+  leftside <- centre(leftside)
+  leftside <- subset(leftside, x >= 0)
+
+  # backface culling (left)
   mat <- as.matrix(leftside)
   normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0))$normals
   normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
   sixcol <- cbind(leftside, normdf)
-  culled <- subset(sixcol, zn > 0)
+  if (sixcol$zn[which.max(sixcol$z)] < 0){
+    culled <- subset(sixcol, zn <= 0)
+  }
+
+  else {
+    culled <- subset(sixcol, zn >= 0)
+  }
   leftside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
-  leftside <- centre(leftside)
 
   # saving left
   shortname <- str_replace(filename, "VERT", "-ramusL")
@@ -177,15 +186,25 @@ wholeramus <- function(sample, filename, folder){
   rad <- pi*2 - atan(slp)
   rightside <- data.frame("x" = (rightside$x * cos(rad)) - (rightside$z * sin(rad)), "y" = rightside$y, "z" = (rightside$x * sin(rad)) + (rightside$z * cos(rad)))
 
-  # cull backfaces (right)
-  rightside <- subset(rightside, z > rightside$z[which.max(rightside$x)])
+  rightside <- centre(rightside)
+  rightside <- subset(rightside, x <= 0)
+  minpoint <- min(c(rightside$z[which.max(rightside$y)], rightside$z[which.max(rightside$x)]))
+  rightside <- subset(rightside, z > minpoint)
+  rightside <- centre(rightside)
+
+  # backface culling (right)
   mat <- as.matrix(rightside)
   normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0))$normals
   normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
   sixcol <- cbind(rightside, normdf)
-  culled <- subset(sixcol, zn > 0)
+  if (sixcol$zn[which.max(sixcol$z)] < 0){
+    culled <- subset(sixcol, zn <= 0)
+  }
+
+  else {
+    culled <- subset(sixcol, zn >= 0)
+  }
   rightside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
-  rightside <- centre(rightside)
 
   # saving right
   shortname <- str_replace(filename, "VERT", "-ramusR")

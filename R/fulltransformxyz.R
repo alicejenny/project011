@@ -80,6 +80,7 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   # slicing
   if (slice == TRUE){
     baseslice(finish, filename, folder)
+    gonialarea(finish, filename, folder)
 
     leftside <- subset(finish, x > 0)
     rightside <- subset(finish, x < 0)
