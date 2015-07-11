@@ -159,7 +159,7 @@ gonialarea <- function(sample, filename, folder){
   leftside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
 
   # saving left
-  shortname <- str_replace(filename, "VERT", "-ramusL")
+  shortname <- str_replace(filename, "VERT", "-gonialL")
   fullfile <- paste(shortname, ".xlsx", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   if (file.exists(fileandpath) == TRUE){
@@ -207,7 +207,7 @@ gonialarea <- function(sample, filename, folder){
   rightside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
 
   # saving right
-  shortname <- str_replace(filename, "VERT", "-ramusR")
+  shortname <- str_replace(filename, "VERT", "-gonialR")
   fullfile <- paste(shortname, ".xlsx", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   if (file.exists(fileandpath) == TRUE){
