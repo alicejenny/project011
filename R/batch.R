@@ -16,7 +16,7 @@ batch <- function(align = TRUE, slice = TRUE){
   nfiles <- length(filelist)
   startTime <- Sys.time()
   startmsg <- paste("WARNING: This could take a while. There are", nfiles, "files to process.", sep = " ")
-  cat(startmsg, "/n")
+  message(startmsg)
 
 # Empty objects
   errorlist <- c()
@@ -75,7 +75,7 @@ batch <- function(align = TRUE, slice = TRUE){
   }
 
   close(pb)
-  cat("File import complete.", "/n")
+  message("File import complete.")
 
 # Printing the error list
   if (length(errorlist) != 0){
@@ -104,5 +104,5 @@ batch <- function(align = TRUE, slice = TRUE){
   }
 
   endTime <- Sys.time()
-  cat(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minute(s).", sep = " "))
+  message(paste("The process took about", round(difftime(endTime, startTime, units = "mins")), "minute(s).", sep = " "))
 }

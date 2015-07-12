@@ -8,9 +8,12 @@ gonialarea <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
 
-  print(head(sample))
+  message("Isolating gonial area.")
 
   sample <- data.frame("x" = sample[,1], "y" = sample[,2], "z" = sample[,3])
+  par(mfrow=c(1,1))
+  plot(sample$y, sample$z, asp = 1)
+  par(mfrow=c(2,3))
 
   # calculating convex hull edge lengths
   hpts <- chull(x = sample$y, y = sample$z)
@@ -68,41 +71,18 @@ gonialarea <- function(sample, filename, folder){
   topfive <- rbind(topfivep1, topfivep2)
 
   # condyle
-  maxz <- which.max(topfive$z)
-  if (maxz > 5){
-    maxz <- maxz - 5
-    maxzline <- rbind(topfivep2[maxz,], topfivep1[maxz,])
-  }
-  else {
-    maxzline <- rbind(topfivep1[maxz,], topfivep2[maxz,])
-  }
-  if (maxzline[2,1] > 0){
-    condyle <- maxzline
-  }
-  else {
-    rem <- subset(topfive, (y != maxzline[1,1] & z != maxzline[1,2]) | (y != maxzline[2,1] & z != maxzline[2,2]))
-    maxz <- which.max(rem$z)
-    if (maxz > 5){
-      maxz <- maxz - 5
-      maxzline <- rbind(topfivep2[maxz,], topfivep1[maxz,])
-    }
-    else {
-      maxzline <- rbind(topfivep1[maxz,], topfivep2[maxz,])
-    }
-    if (maxzline[2,1] > 0){
-      condyle <- maxzline
-    }
-    else {
-      message("Can't find the condyle.")
-      condyle <- NULL
-    }
-  }
-  condyleR <- condyle[which.max(condyle$y),]
+  zmax <- max(topfive$z)
+  trquad <- subset(topfive, y > 0 & z > (zmax/2))
+  trquad <- trquad[ order(-trquad$y), ]
+  toptwo <- trquad[1:2,]
+  condyleR <- toptwo[which.max(toptwo$z),]
+  points(condyleR$y, condyleR$z, col = "orange")
 
   # ramus
   rhalf <- subset(topfive, y > 0)
   rhalf <- rhalf[ order(rhalf$z, rhalf$y), ]
   ramusB <- rhalf[2,]
+  points(ramusB$y, ramusB$z, col = "purple")
 
   # min y
   top <- subset(sample, z >= max(sample$y))
@@ -188,11 +168,10 @@ gonialarea <- function(sample, filename, folder){
   rad <- pi*2 - atan(slp)
   rightside <- data.frame("x" = (rightside$x * cos(rad)) - (rightside$z * sin(rad)), "y" = rightside$y, "z" = (rightside$x * sin(rad)) + (rightside$z * cos(rad)))
 
-  rightside <- centre(rightside)
-  rightside <- subset(rightside, x <= 0)
   minpoint <- min(c(rightside$z[which.max(rightside$y)], rightside$z[which.max(rightside$x)]))
   rightside <- subset(rightside, z > minpoint)
   rightside <- centre(rightside)
+  rightside <- subset(rightside, x <= 0)
 
   # backface culling (right)
   mat <- as.matrix(rightside)
