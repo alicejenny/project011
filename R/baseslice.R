@@ -6,6 +6,10 @@
 baseslice <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
+
+  msg <- paste("Isolating base for mandible ", str_replace(filename, "VERT", ""))
+  message(msg)
+
   menempt <- subset(sample, z < (sample$z[which.min(sample$y)] + (max(sample$z) * 0.1)))
   globname <- str_replace(filename, "VERT", "-base")
   flipped <- data.frame("x" = menempt$x, "y" = (menempt$y * cos(pi)) - (menempt$z * sin(pi)), "z" = (menempt$y * sin(pi)) + (menempt$z * cos(pi)))
@@ -15,6 +19,7 @@ baseslice <- function(sample, filename, folder){
   sixcol <- cbind(flipped, normdf)
   culled <- subset(sixcol, zn < 0)
   finish <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
+  finish <-  centre(finish)
 
   # saving
   shortname <- str_replace(filename, "VERT", "-base")
@@ -27,4 +32,7 @@ baseslice <- function(sample, filename, folder){
   addWorksheet(wb, shortname)
   writeData(wb, shortname, finish, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
+
+  plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
+  plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
 }

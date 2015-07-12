@@ -7,6 +7,10 @@
 ramusslice <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
+
+  msg <- paste("Isolating posterior ramus for mandible ", str_replace(filename, "VERT", ""))
+  message(msg)
+
   # calculating convex hull edge lengths
   hpts <- chull(x = sample$y, y = sample$z)
   hf <- data.frame("y" = sample$y[hpts], "z" = sample$z[hpts])
@@ -68,36 +72,11 @@ ramusslice <- function(sample, filename, folder){
   baseR <- base[which.max(base$y),]
 
   # condyle
-  maxz <- which.max(topfive$z)
-  if (maxz > 5){
-    maxz <- maxz - 5
-    maxzline <- rbind(topfivep2[maxz,], topfivep1[maxz,])
-  }
-  else {
-    maxzline <- rbind(topfivep1[maxz,], topfivep2[maxz,])
-  }
-  if (maxzline[2,1] > 0){
-    condyle <- maxzline
-  }
-  else {
-    rem <- subset(topfive, (y != maxzline[1,1] & z != maxzline[1,2]) | (y != maxzline[2,1] & z != maxzline[2,2]))
-    maxz <- which.max(rem$z)
-    if (maxz > 5){
-      maxz <- maxz - 5
-      maxzline <- rbind(topfivep2[maxz,], topfivep1[maxz,])
-    }
-    else {
-      maxzline <- rbind(topfivep1[maxz,], topfivep2[maxz,])
-    }
-    if (maxzline[2,1] > 0){
-      condyle <- maxzline
-    }
-    else {
-      cat("Can't find the condyle.")
-      condyle <- NULL
-    }
-  }
-  condyleR <- condyle[which.max(condyle$y),]
+  zmax <- max(topfive$z)
+  trquad <- subset(topfive, y > 0 & z > (zmax/2))
+  trquad <- trquad[ order(-trquad$y), ]
+  toptwo <- trquad[1:2,]
+  condyleR <- toptwo[which.max(toptwo$z),]
 
   # find slope
   slp.ypoints <- c(condyleR[1,1], baseR[1,1])
@@ -114,15 +93,25 @@ ramusslice <- function(sample, filename, folder){
   rad <- pi - atan(slp)
   ramusrot <- data.frame("x" = ramus$x, "y" = (ramus$y * cos(rad)) - (ramus$z * sin(rad)), "z" = (ramus$y * sin(rad)) + (ramus$z * cos(rad)))
 
-  # centring
-  ramusrot <- centre(ramusrot)
+  # left side
+  leftside <- subset(ramusrot, x > 0)
+  centre(leftside)
 
-  # backface culling
-  mat <- as.matrix(ramusrot)
+  ymin.y <- min(leftside$y)
+  ymin.x <- leftside$x[which.min(leftside$y)]
+  ymax.y <- max(leftside$y)
+  ymax.x <- leftside$x[which.max(leftside$y)]
+  slp.ypoints <- c(ymin.y, ymax.y)
+  slp.xpoints <- c(ymin.x, ymax.x)
+  slp <- diff(slp.ypoints)/diff(slp.xpoints)
+  rad <- pi/2 - atan(slp)
+  leftside <- data.frame("x" = (leftside$x * cos(rad)) - (leftside$y * sin(rad)), "y" = (leftside$x * sin(rad)) + (leftside$y * cos(rad)), "z" = leftside$z)
+
+  # backface culling (left)
+  mat <- as.matrix(leftside)
   normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0))$normals
   normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
-  sixcol <- cbind(ramusrot, normdf)
-
+  sixcol <- cbind(leftside, normdf)
   if (sixcol$zn[which.max(sixcol$z)] < 0){
     culled <- subset(sixcol, zn <= 0)
   }
@@ -130,11 +119,10 @@ ramusslice <- function(sample, filename, folder){
   else {
     culled <- subset(sixcol, zn >= 0)
   }
+  leftside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
 
-  finish <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
-
-  # saving
-  shortname <- str_replace(filename, "VERT", "-posramus")
+  # saving left
+  shortname <- str_replace(filename, "VERT", "-ramusL")
   fullfile <- paste(shortname, ".xlsx", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   if (file.exists(fileandpath) == TRUE){
@@ -142,6 +130,49 @@ ramusslice <- function(sample, filename, folder){
   }
   wb <- createWorkbook()
   addWorksheet(wb, shortname)
-  writeData(wb, shortname, finish, colNames = TRUE, rowNames = FALSE)
+  writeData(wb, shortname, leftside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
+
+  # right side
+  rightside <- subset(ramusrot, x < 0)
+  centre(rightside)
+
+  ymin.y <- min(rightside$y)
+  ymin.x <- rightside$x[which.min(rightside$y)]
+  ymax.y <- max(rightside$y)
+  ymax.x <- rightside$x[which.max(rightside$y)]
+  slp.ypoints <- c(ymin.y, ymax.y)
+  slp.xpoints <- c(ymin.x, ymax.x)
+  slp <- diff(slp.ypoints)/diff(slp.xpoints)
+  rad <- pi*1.5 - atan(slp)
+  rightside <- data.frame("x" = (rightside$x * cos(rad)) - (rightside$y * sin(rad)), "y" = (rightside$x * sin(rad)) + (rightside$y * cos(rad)), "z" = rightside$z)
+
+  # backface culling (right)
+  mat <- as.matrix(rightside)
+  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0))$normals
+  normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
+  sixcol <- cbind(rightside, normdf)
+  if (sixcol$zn[which.max(sixcol$z)] < 0){
+    culled <- subset(sixcol, zn <= 0)
+  }
+
+  else {
+    culled <- subset(sixcol, zn >= 0)
+  }
+  rightside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
+
+  # saving right
+  shortname <- str_replace(filename, "VERT", "-ramusR")
+  fullfile <- paste(shortname, ".xlsx", sep = "")
+  fileandpath <- paste(folder, fullfile, sep = "//")
+  if (file.exists(fileandpath) == TRUE){
+    file.remove(fileandpath)
+  }
+  wb <- createWorkbook()
+  addWorksheet(wb, shortname)
+  writeData(wb, shortname, rightside, colNames = TRUE, rowNames = FALSE)
+  saveWorkbook(wb, fileandpath, overwrite = TRUE)
+
+  plot(leftside$x, leftside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
+  plot(rightside$x, rightside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
 }

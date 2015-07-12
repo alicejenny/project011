@@ -13,12 +13,6 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   # progress bar
   pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 10)
 
-  # initial plots
-  par(mfrow=c(2,3))
-  plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
-  plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
-  plot(sample$x, sample$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start xz", sep = " "), asp = 1)
-
   #empty objects
   src <- nrow(sample)
   finish <- data.frame("x" = numeric(src), "y" = numeric(src), "z" = numeric(src))
@@ -81,17 +75,16 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   if (slice == TRUE){
     baseslice(finish, filename, folder)
     gonialarea(finish, filename, folder)
-
-    leftside <- subset(finish, x > 0)
-    rightside <- subset(finish, x < 0)
-    lfn <- str_replace(filename, "VERT", "LVERT")
-    rfn <- str_replace(filename, "VERT", "RVERT")
-
-    ramusslice(leftside, lfn, folder)
-    ramusslice(rightside, rfn, folder)
+    ramusslice(finish, filename, folder)
   }
 
-  #plotting graphs
+  # initial plots
+  par(mfrow=c(2,3))
+  plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
+  plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
+  plot(sample$x, sample$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start xz", sep = " "), asp = 1)
+
+  # finished plots
   setWinProgressBar(pb, 8, label = "Plotting graphs...")
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "finish xy", sep = " "), asp = 1)
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
@@ -128,4 +121,7 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   # returning results
   returnlist <- data.frame("saved.as" = fullfile, "runtime" = runtime, "loops" = l, "x.diff" = as.integer(unlist(strsplit(changemade[1], " "))[6]), "y.diff" = as.integer(unlist(strsplit(changemade[2], " "))[6]), "z.diff" = as.integer(unlist(strsplit(changemade[3], " "))[6]))
   assign("returnlist", returnlist, envir = parent.frame())
+
+  msg <- paste("Finished mandible ", str_replace(filename, "VERT", ""))
+  message(msg)
 }

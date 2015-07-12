@@ -8,12 +8,10 @@ gonialarea <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
 
-  message("Isolating gonial area.")
+  msg <- paste("Isolating gonial area for mandible ", str_replace(filename, "VERT", ""))
+  message(msg)
 
   sample <- data.frame("x" = sample[,1], "y" = sample[,2], "z" = sample[,3])
-  par(mfrow=c(1,1))
-  plot(sample$y, sample$z, asp = 1)
-  par(mfrow=c(2,3))
 
   # calculating convex hull edge lengths
   hpts <- chull(x = sample$y, y = sample$z)
@@ -76,13 +74,11 @@ gonialarea <- function(sample, filename, folder){
   trquad <- trquad[ order(-trquad$y), ]
   toptwo <- trquad[1:2,]
   condyleR <- toptwo[which.max(toptwo$z),]
-  points(condyleR$y, condyleR$z, col = "orange")
 
   # ramus
   rhalf <- subset(topfive, y > 0)
   rhalf <- rhalf[ order(rhalf$z, rhalf$y), ]
   ramusB <- rhalf[2,]
-  points(ramusB$y, ramusB$z, col = "purple")
 
   # min y
   top <- subset(sample, z >= max(sample$y))
@@ -199,11 +195,6 @@ gonialarea <- function(sample, filename, folder){
   writeData(wb, shortname, rightside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
-  # plot graphs for testing
-  plot(leftside$x, leftside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "left gonial xy", sep = " "), asp = 1)
-  plot(leftside$y, leftside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left gonial yz", sep = " "), asp = 1)
-  plot(leftside$x, leftside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left gonial xz", sep = " "), asp = 1)
-  plot(rightside$x, rightside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "right gonial xy", sep = " "), asp = 1)
-  plot(rightside$y, rightside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right gonial yz", sep = " "), asp = 1)
-  plot(rightside$x, rightside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right gonial xz", sep = " "), asp = 1)
-}
+  plot(leftside$x, leftside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "left gonial area", sep = " "), asp = 1)
+  plot(rightside$x, rightside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "right gonial area", sep = " "), asp = 1)
+  }
