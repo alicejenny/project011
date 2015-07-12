@@ -66,7 +66,7 @@ menemslice <- function(sample, filename, folder){
   menemfin <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
 
   # saving
-  shortname <- str_replace(filename, "VERT", "-base")
+  shortname <- str_replace(filename, "VERT", "-menem")
   fullfile <- paste(shortname, ".xlsx", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   if (file.exists(fileandpath) == TRUE){
