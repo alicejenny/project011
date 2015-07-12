@@ -9,9 +9,11 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   require(openxlsx)
   # start time for calculating run time
   starttime <- Sys.time()
+  par(mfrow=c(2,3))
+  mandiblename <- str_replace(filename, "VERT", ".")
 
   # progress bar
-  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 10)
+  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 12)
 
   #empty objects
   src <- nrow(sample)
@@ -20,7 +22,7 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   stable <- FALSE
 
   # centering
-  setWinProgressBar(pb, 1, label = "Centering...")
+  setWinProgressBar(pb, 1, label = paste("Centering", mandiblename))
   loopstart <- centre(sample)
 
   while (!stable){
@@ -33,39 +35,41 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
     }
 
     # xy transform
-    setWinProgressBar(pb, 2, label = "Transforming XY...")
+    setWinProgressBar(pb, 2, label = paste("Transforming XY for", mandiblename))
     xytransform.res <- xytransform(loopstart)
     xytransform.res <- centre(xytransform.res)
 
     # yz transform
-    setWinProgressBar(pb, 3, label = "Transforming YZ...")
+    setWinProgressBar(pb, 3, label = paste("Transforming YZ for", mandiblename))
     yztransform.res <- yztransform(xytransform.res)
     yztransform.res <- centre(yztransform.res)
 
     # xy transform again
-    setWinProgressBar(pb, 4, label = "Transforming XY again...")
+    setWinProgressBar(pb, 4, label = paste("Transforming XY again for", mandiblename))
     xytransform.res <- xytransform(yztransform.res)
     xytransform.res <- centre(xytransform.res)
 
     # yz align
-    setWinProgressBar(pb, 6, label = "Aligning YZ...")
+    setWinProgressBar(pb, 6, label = paste("Aligning YZ for", mandiblename))
     yzalign.res <- yzalign(xytransform.res)
     yzalign.res <- centre(yzalign.res)
 
     # xz transform
-    setWinProgressBar(pb, 7, label = "Transforming XZ...")
+    setWinProgressBar(pb, 7, label = paste("Transforming XZ for", mandiblename))
     xztransform.res <- xztransform(yzalign.res)
     xztransform.res <- centre(xztransform.res)
 
     finish <- xztransform.res
 
     if (l == 200){
-      print("Maximum loops reached. Aligning process terminated.")
+      breakmsg <- paste("Maximum loops reached. Aligning process terminated for mandible", str_replace(filename, "VERT", "."))
+      message(breakmsg)
       break
     }
   }
 
   # rotating so chin is down
+  setWinProgressBar(pb, 8, label = paste("Checking orientation for", mandiblename))
   xmax.y <- finish$y[which.max(finish$x)]
   if (xmax.y < 0){
     finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
@@ -73,19 +77,19 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
 
   # slicing
   if (slice == TRUE){
+    setWinProgressBar(pb, 9, label = paste("Slicing", mandiblename))
     baseslice(finish, filename, folder)
     gonialarea(finish, filename, folder)
     ramusslice(finish, filename, folder)
   }
 
   # initial plots
-  par(mfrow=c(2,3))
+  setWinProgressBar(pb, 10, label = paste("Plotting graphs for", mandiblename))
   plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
   plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
   plot(sample$x, sample$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start xz", sep = " "), asp = 1)
 
   # finished plots
-  setWinProgressBar(pb, 8, label = "Plotting graphs...")
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "finish xy", sep = " "), asp = 1)
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
   edgelength(finish$y, finish$z)
@@ -96,13 +100,13 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   assign(globname, finish, envir = .GlobalEnv)
 
   # saving as an xyz file
-  setWinProgressBar(pb, 9, label = "Writing to file...")
+  setWinProgressBar(pb, 11, label = paste("Writing", mandiblename, "to file"))
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   write.table(finish, fileandpath, row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
-  setWinProgressBar(pb, 10)
+  setWinProgressBar(pb, 12)
   close(pb)
 
   # calculating change made

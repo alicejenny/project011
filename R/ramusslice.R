@@ -8,7 +8,7 @@ ramusslice <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
 
-  msg <- paste("Isolating posterior ramus for mandible ", str_replace(filename, "VERT", ""))
+  msg <- paste("Isolating posterior ramus for mandible", str_replace(filename, "VERT", ""))
   message(msg)
 
   # calculating convex hull edge lengths
@@ -109,7 +109,7 @@ ramusslice <- function(sample, filename, folder){
 
   # backface culling (left)
   mat <- as.matrix(leftside)
-  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0))$normals
+  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
   normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
   sixcol <- cbind(leftside, normdf)
   if (sixcol$zn[which.max(sixcol$z)] < 0){
@@ -149,7 +149,7 @@ ramusslice <- function(sample, filename, folder){
 
   # backface culling (right)
   mat <- as.matrix(rightside)
-  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0))$normals
+  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
   normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
   sixcol <- cbind(rightside, normdf)
   if (sixcol$zn[which.max(sixcol$z)] < 0){
