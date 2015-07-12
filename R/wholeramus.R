@@ -8,6 +8,8 @@ gonialarea <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
 
+  print(head(sample))
+
   sample <- data.frame("x" = sample[,1], "y" = sample[,2], "z" = sample[,3])
 
   # calculating convex hull edge lengths
@@ -217,4 +219,12 @@ gonialarea <- function(sample, filename, folder){
   addWorksheet(wb, shortname)
   writeData(wb, shortname, rightside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
+
+  # plot graphs for testing
+  plot(leftside$x, leftside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "left gonial xy", sep = " "), asp = 1)
+  plot(leftside$y, leftside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left gonial yz", sep = " "), asp = 1)
+  plot(leftside$x, leftside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left gonial xz", sep = " "), asp = 1)
+  plot(rightside$x, rightside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "right gonial xy", sep = " "), asp = 1)
+  plot(rightside$y, rightside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right gonial yz", sep = " "), asp = 1)
+  plot(rightside$x, rightside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right gonial xz", sep = " "), asp = 1)
 }
