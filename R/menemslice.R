@@ -4,9 +4,12 @@
 #' @param sample The input data frame. 3 named columns (x, y, and z, in that order).
 #' @export
 
-menemslice <- function(sample){
+menemslice <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
+
+  msg <- paste("Isolating mental eminence for mandible", str_replace(filename, "VERT", ""))
+  message(msg)
 
   # calculating convex hull edge lengths
   topfiveedges(sample$y, sample$z)
@@ -62,18 +65,19 @@ menemslice <- function(sample){
   }
   menemfin <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
 
-  par(mfrow=c(1,3))
-  #plot(sample$y, sample$z, asp = 1)
-  #points(chintop$y, chintop$z, col = "red")
-  plot(menemrot$x, menemrot$y, asp = 1, main = "rotated xy")
-  plot(menemrot$y, menemrot$z, asp = 1, main = "rotated yz")
-  plot(menemrot$x, menemrot$z, asp = 1, main = "rotated xz")
+  # saving
+  shortname <- str_replace(filename, "VERT", "-base")
+  fullfile <- paste(shortname, ".xlsx", sep = "")
+  fileandpath <- paste(folder, fullfile, sep = "//")
+  if (file.exists(fileandpath) == TRUE){
+    file.remove(fileandpath)
+  }
+  wb <- createWorkbook()
+  addWorksheet(wb, shortname)
+  writeData(wb, shortname, menemfin, colNames = TRUE, rowNames = FALSE)
+  saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
-  plot(menem.noteeth$x, menem.noteeth$y, asp = 1, main = "no teeth xy")
-  plot(menem.noteeth$y, menem.noteeth$z, asp = 1, main = "no teeth yz")
-  plot(menem.noteeth$x, menem.noteeth$z, asp = 1, main = "no teeth xz")
-
-  plot(menemfin$x, menemfin$y, asp = 1, main = "final xy")
-  plot(menemfin$y, menemfin$z, asp = 1, main = "final yz")
-  plot(menemfin$x, menemfin$z, asp = 1, main = "final xz")
+  plot(menemfin$x, menemfin$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+  plot(menemfin$y, menemfin$z, asp = 1, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+  plot(menemfin$x, menemfin$z, asp = 1, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
 }

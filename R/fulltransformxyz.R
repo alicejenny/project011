@@ -9,7 +9,7 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   require(openxlsx)
   # start time for calculating run time
   starttime <- Sys.time()
-  par(mfrow=c(2,3))
+  par(mfrow=c(3,3))
   mandiblename <- str_replace(filename, "VERT", ".")
 
   # progress bar
@@ -81,9 +81,11 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
     baseslice(finish, filename, folder)
     gonialarea(finish, filename, folder)
     ramusslice(finish, filename, folder)
+    menemslice(finish, filename, folder)
   }
 
   # initial plots
+  par(mfrow=c(2,3))
   setWinProgressBar(pb, 10, label = paste("Plotting graphs for", mandiblename))
   plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
   plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
