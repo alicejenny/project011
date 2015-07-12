@@ -17,7 +17,13 @@ baseslice <- function(sample, filename, folder){
   normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
   normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
   sixcol <- cbind(flipped, normdf)
-  culled <- subset(sixcol, zn < 0)
+  if (sixcol$zn[which.max(sixcol$z)] < 0){
+    culled <- subset(sixcol, zn <= 0)
+  }
+
+  else {
+    culled <- subset(sixcol, zn >= 0)
+  }
   finish <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
   finish <-  centre(finish)
 
