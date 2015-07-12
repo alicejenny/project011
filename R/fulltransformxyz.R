@@ -9,7 +9,6 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   require(openxlsx)
   # start time for calculating run time
   starttime <- Sys.time()
-  par(mfrow=c(3,3))
   mandiblename <- str_replace(filename, "VERT", ".")
 
   # progress bar
@@ -75,15 +74,6 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
     finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
   }
 
-  # slicing
-  if (slice == TRUE){
-    setWinProgressBar(pb, 9, label = paste("Slicing", mandiblename))
-    baseslice(finish, filename, folder)
-    gonialarea(finish, filename, folder)
-    ramusslice(finish, filename, folder)
-    menemslice(finish, filename, folder)
-  }
-
   # initial plots
   par(mfrow=c(2,3))
   setWinProgressBar(pb, 10, label = paste("Plotting graphs for", mandiblename))
@@ -96,6 +86,16 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
   edgelength(finish$y, finish$z)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish xz", sep = " "), asp = 1)
+
+  # slicing
+  if (slice == TRUE){
+    par(mfrow=c(3,3))
+    setWinProgressBar(pb, 9, label = paste("Slicing", mandiblename))
+    baseslice(finish, filename, folder)
+    gonialarea(finish, filename, folder)
+    ramusslice(finish, filename, folder)
+    menemslice(finish, filename, folder)
+  }
 
   #returning to global environment
   globname <- str_replace(filename, "VERT", ".al")
