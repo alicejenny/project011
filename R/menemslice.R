@@ -9,66 +9,16 @@ menemslice <- function(sample){
   require(Rvcg)
 
   # calculating convex hull edge lengths
-  hpts <- chull(x = sample$y, y = sample$z)
-  hf <- data.frame("y" = sample$y[hpts], "z" = sample$z[hpts])
-  npts <- nrow(hf)
-  dist <- data.frame("dist" = numeric(npts), "p1y" = numeric(npts), "p1z" = numeric(npts), "p2y" = numeric(npts), "p2z" = numeric(npts))
-  for (i in 1:npts){
-    if (i != npts){
-      a <- abs(hf$y[i] - hf$y[i+1])
-      b <- abs(hf$z[i] - hf$z[i+1])
-      dist$p1y[i] <- hf$y[i]
-      dist$p2y[i] <- hf$y[i+1]
-      dist$p1z[i] <- hf$z[i]
-      dist$p2z[i] <- hf$z[i+1]
-    }
-    else {
-      a <- abs(hf$y[i] - hf$y[1])
-      b <- abs(hf$z[i] - hf$z[1])
-      dist$p1y[i] <- hf$y[i]
-      dist$p2y[i] <- hf$y[1]
-      dist$p1z[i] <- hf$z[i]
-      dist$p2z[i] <- hf$z[1]
-    }
-
-    c2 <- (a^2) + (b^2)
-    c <- sqrt(c2)
-    dist$dist[i] <- c
-  }
-
-  sorted <- dist[ order(-dist$dist, dist$p1y, dist$p2y), ]
-
-  #longest
-  one <- data.frame("y" = c(sorted$p1y[1],sorted$p2y[1]), "z" = c(sorted$p1z[1], sorted$p2z[1]))
-  one <- one[ order(one$z, one$y), ]
-
-  # second longest
-  two <- data.frame("y" = c(sorted$p1y[2],sorted$p2y[2]), "z" = c(sorted$p1z[2], sorted$p2z[2]))
-  two <- two[ order(two$z, two$y), ]
-
-  # third longest
-  three <- data.frame("y" = c(sorted$p1y[3],sorted$p2y[3]), "z" = c(sorted$p1z[3], sorted$p2z[3]))
-  three <- three[ order(three$z, three$y), ]
-
-  # fourth longest
-  four <- data.frame("y" = c(sorted$p1y[4],sorted$p2y[4]), "z" = c(sorted$p1z[4], sorted$p2z[4]))
-  four <- four[ order(four$z, four$y), ]
-
-  # fifth longest
-  five <- data.frame("y" = c(sorted$p1y[5],sorted$p2y[5]), "z" = c(sorted$p1z[5], sorted$p2z[5]))
-  five <- five[ order(five$z, five$y), ]
-
-  # top five
-  topfivep1 <- rbind(one[1,],two[1,],three[1,],four[1,],five[1,])
-  topfivep2 <- rbind(one[2,],two[2,],three[2,],four[2,],five[2,])
-  topfive <- rbind(topfivep1, topfivep2)
+  topfiveedges(sample$y, sample$z)
 
   # finding chin top
-  if (min(topfivep1$y) < min(topfivep2$y)){
-    chintop <- topfivep2[which.min(topfivep1$y),]
+  if (min(topfivep1$x) < min(topfivep2$x)){
+    chintop <- topfivep2[which.min(topfivep1$x),]
+    chintop <- data.frame("y" = chintop$x[1], "z" = chintop$y[1])
   }
-  if (min(topfivep2$y) < min(topfivep1$y)){
-    chintop <- topfivep1[which.min(topfivep2$y),]
+  if (min(topfivep2$x) < min(topfivep1$x)){
+    chintop <- topfivep1[which.min(topfivep2$x),]
+    chintop <- data.frame("y" = chintop$x[1], "z" = chintop$y[1])
   }
 
   # isolate base
@@ -88,11 +38,42 @@ menemslice <- function(sample){
   rad <- pi * 1.5
   menemrot <- data.frame("x" = menem$x, "y" = (menem$y * cos(rad)) - (menem$z * sin(rad)), "z" = (menem$y * sin(rad)) + (menem$z * cos(rad)))
 
+  # remove teeth
+  topfiveedges(menemrot$x, menemrot$y)
+  top5tophalf <- subset(topfive, y > (max(menemrot$y) * 0.75))
+  # xmin top
+  xmintop <- top5tophalf[which.min(top5tophalf$x),]
+  # xmax top
+  xmaxtop <- top5tophalf[which.max(top5tophalf$x),]
+  # lowest y
+  menem.noteeth <- subset(menemrot, y < min(xmintop$y[1], xmaxtop$y[1]))
+
+  # backface culling
+  mat <- as.matrix(menem.noteeth)
+  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
+  normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
+  sixcol <- cbind(menem.noteeth, normdf)
+  if (sixcol$zn[which.max(sixcol$z)] < 0){
+    culled <- subset(sixcol, zn <= 0)
+  }
+
+  else {
+    culled <- subset(sixcol, zn >= 0)
+  }
+  menemfin <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
+
   par(mfrow=c(1,3))
   #plot(sample$y, sample$z, asp = 1)
   #points(chintop$y, chintop$z, col = "red")
-  plot(menemrot$x, menemrot$y, asp = 1)
-  edgelength(menemrot$x, menemrot$y)
-  plot(menemrot$y, menemrot$z, asp = 1)
-  plot(menemrot$x, menemrot$z, asp = 1)
+  plot(menemrot$x, menemrot$y, asp = 1, main = "rotated xy")
+  plot(menemrot$y, menemrot$z, asp = 1, main = "rotated yz")
+  plot(menemrot$x, menemrot$z, asp = 1, main = "rotated xz")
+
+  plot(menem.noteeth$x, menem.noteeth$y, asp = 1, main = "no teeth xy")
+  plot(menem.noteeth$y, menem.noteeth$z, asp = 1, main = "no teeth yz")
+  plot(menem.noteeth$x, menem.noteeth$z, asp = 1, main = "no teeth xz")
+
+  plot(menemfin$x, menemfin$y, asp = 1, main = "final xy")
+  plot(menemfin$y, menemfin$z, asp = 1, main = "final yz")
+  plot(menemfin$x, menemfin$z, asp = 1, main = "final xz")
 }
