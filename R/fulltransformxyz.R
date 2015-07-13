@@ -2,14 +2,18 @@
 #'
 #' For calling from batch().
 #' @param sample The input data frame. 3 columns (x, y, and z, in that order).
+#' @param filename A string representing the generic filename, e.g. "m01178MXVERT".
+#' @param folder The folder in which the processed files will be saved.
+#' @param slice Logical value. If TRUE, the aligned mandible will be further processed to isolate specific areas (the base, gonial areas, rami, and mental eminence).
+#' @param saveplots Logical value. If TRUE, plots will be cleared from the console and saved as .png files.
 #' @export
 
-align2 <- function(sample, filename, folder, slice = TRUE) {
+align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
   library(stringr)
   require(openxlsx)
   # start time for calculating run time
   starttime <- Sys.time()
-  mandiblename <- str_replace(filename, "VERT", ".")
+  mandiblename <- str_replace(filename, "VERT", "")
 
   # progress bar
   pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 8)
@@ -76,46 +80,77 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
 
   # user input for yz rotation
   close(pb)
+  dev.new()
   par(mfrow=c(1,1))
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "yz rotation test", sep = " "), asp = 1)
   edgelength(finish$y, finish$z)
 
   n <- (as.numeric(readline("Rotation (degrees): ")) / 180)
-  rot <- n * pi
-  finish <- data.frame("x" = finish$x, "y" = (finish$y * cos(rot)) - (finish$z * sin(rot)), "z" = (finish$y * sin(rot)) + (finish$z * cos(rot)))
 
-  plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "yz rotated", sep = " "), asp = 1)
-  edgelength(finish$y, finish$z)
+  dev.off()
 
-  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 8)
+  if (n != 0){
+    rot <- n * pi
+    finish <- data.frame("x" = finish$x, "y" = (finish$y * cos(rot)) - (finish$z * sin(rot)), "z" = (finish$y * sin(rot)) + (finish$z * cos(rot)))
 
-  # running align again
-  # xy transform again
-  setWinProgressBar(pb, 1, label = paste("Transforming XY again for", mandiblename))
-  xytransform.res <- xytransform(finish)
-  xytransform.res <- centre(xytransform.res)
+    pb <- winProgressBar(title = "Aligning again...", label = "Initialising...", max = 4)
 
-  # yz align
-  setWinProgressBar(pb, 2, label = paste("Aligning YZ for", mandiblename))
-  yzalign.res <- yzalign(xytransform.res)
-  yzalign.res <- centre(yzalign.res)
+    dev.new()
+    par(mfrow=c(1,1))
 
-  # xz transform
-  setWinProgressBar(pb, 3, label = paste("Transforming XZ for", mandiblename))
-  xztransform.res <- xztransform(yzalign.res)
-  xztransform.res <- centre(xztransform.res)
+    # running align again
+    # xy transform again
+    setWinProgressBar(pb, 1, label = paste("Transforming XY for", mandiblename))
+    xytransform.res <- xytransform(finish)
+    xytransform.res <- centre(xytransform.res)
+    plot(xytransform.res$y, xytransform.res$z, xlab = "y", ylab = "z", main = "xy", asp = 1)
+    edgelength(xytransform.res$y, xytransform.res$z)
 
-  finish <- xztransform.res
+    # yz align
+    setWinProgressBar(pb, 2, label = paste("Aligning YZ for", mandiblename))
+    yzalign.res <- yzalign(xytransform.res)
+    yzalign.res <- centre(yzalign.res)
+    plot(yzalign.res$y, yzalign.res$z, xlab = "y", ylab = "z", main = "yz", asp = 1)
+    edgelength(yzalign.res$y, yzalign.res$z)
 
-  setWinProgressBar(pb, 4, label = paste("Checking orientation for", mandiblename))
-  xmax.y <- finish$y[which.max(finish$x)]
-  if (xmax.y < 0){
-    finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
+    # xz transform
+    setWinProgressBar(pb, 3, label = paste("Transforming XZ for", mandiblename))
+    xztransform.res <- xztransform(yzalign.res)
+    xztransform.res <- centre(xztransform.res)
+
+    finish <- xztransform.res
+
+    setWinProgressBar(pb, 4, label = paste("Checking orientation for", mandiblename))
+    xmax.y <- finish$y[which.max(finish$x)]
+    if (xmax.y < 0){
+      finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
+    }
+
+    close(pb)
+
+    # okay to continue?
+    ok <- readline("Okay to continue? (Y/N): ")
+    if (ok == "N"){
+      break
+    }
+    dev.off()
+  }
+
+  pb <- winProgressBar(title = "Finishing up...", label = "Initialising...", max = 4)
+
+  # plot save info
+  plotpath <- paste(folder, "plots\\", sep = "\\")
+  if (dir.exists(plotpath) == FALSE){
+    dir.create(plotpath)
   }
 
   # initial plots
+  dev.new()
+  if (saveplots == TRUE){
+    png(filename = paste(plotpath, mandiblename, "-aligned", ".png", sep = ""), width = 1000, height = 1000)
+  }
   par(mfrow=c(2,3))
-  setWinProgressBar(pb, 5, label = paste("Plotting graphs for", mandiblename))
+  setWinProgressBar(pb, 1, label = paste("Plotting graphs for", mandiblename))
   plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
   plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
   plot(sample$x, sample$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start xz", sep = " "), asp = 1)
@@ -125,6 +160,9 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish yz", sep = " "), asp = 1)
   edgelength(finish$y, finish$z)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish xz", sep = " "), asp = 1)
+  if (saveplots == TRUE){
+    dev.off()
+  }
 
   #returning to global environment
   globname <- str_replace(filename, "VERT", ".al")
@@ -132,22 +170,61 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
 
   # slicing
   if (slice == TRUE){
-    par(mfrow=c(3,3))
-    setWinProgressBar(pb, 6, label = paste("Slicing", mandiblename))
+    setWinProgressBar(pb, 2, label = paste("Slicing", mandiblename))
+
+    # base
+    dev.new()
+    par(mfrow=c(1,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-base", ".png", sep = ""), width = 1000, height = 1000)
+    }
     baseslice(finish, filename, folder)
+    if (saveplots == TRUE){
+      dev.off()
+    }
+
+    # gonial areas
+    dev.new()
+    par(mfrow=c(2,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-gonialarea", ".png", sep = ""), width = 1000, height = 1000)
+    }
     gonialarea(finish, filename, folder)
+    if (saveplots == TRUE){
+      dev.off()
+    }
+
+    # rami
+    dev.new()
+    par(mfrow=c(2,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-rami", ".png", sep = ""), width = 1000, height = 1000)
+    }
     ramusslice(finish, filename, folder)
+    if (saveplots == TRUE){
+      dev.off()
+    }
+
+    # mental eminence
+    dev.new()
+    par(mfrow=c(1,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
+    }
     menemslice(finish, filename, folder)
+    if (saveplots == TRUE){
+      dev.off()
+    }
   }
 
   # saving as an xyz file
-  setWinProgressBar(pb, 7, label = paste("Writing", mandiblename, "to file"))
+  setWinProgressBar(pb, 3, label = paste("Writing", mandiblename, "to file"))
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   write.table(finish, fileandpath, row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
-  setWinProgressBar(pb, 8)
+  setWinProgressBar(pb, 4)
   close(pb)
 
   # calculating change made
@@ -167,6 +244,6 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   returnlist <- data.frame("saved.as" = fullfile, "runtime" = runtime, "loops" = l, "x.diff" = as.integer(unlist(strsplit(changemade[1], " "))[6]), "y.diff" = as.integer(unlist(strsplit(changemade[2], " "))[6]), "z.diff" = as.integer(unlist(strsplit(changemade[3], " "))[6]))
   assign("returnlist", returnlist, envir = parent.frame())
 
-  msg <- paste("Finished mandible ", str_replace(filename, "VERT", ""))
+  msg <- paste("Finished mandible", str_replace(filename, "VERT", ""))
   message(msg)
 }

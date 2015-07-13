@@ -4,10 +4,18 @@
 \alias{align2}
 \title{Align Mandible}
 \usage{
-align2(sample, filename, folder, slice = TRUE)
+align2(sample, filename, folder, slice = TRUE, saveplots = TRUE)
 }
 \arguments{
 \item{sample}{The input data frame. 3 columns (x, y, and z, in that order).}
+
+\item{filename}{A string representing the generic filename, e.g. "m01178MXVERT".}
+
+\item{folder}{The folder in which the processed files will be saved.}
+
+\item{slice}{Logical value. If TRUE, the aligned mandible will be further processed to isolate specific areas (the base, gonial areas, rami, and mental eminence).}
+
+\item{saveplots}{Logical value. If TRUE, plots will be cleared from the console and saved as .png files.}
 }
 \description{
 For calling from batch().

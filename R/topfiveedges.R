@@ -1,3 +1,8 @@
+#' Find the five longest edges of convex hull
+#'
+#' Find the five longest edges of convex hull. Returns topfivep1 (one set of points), topfivep2 (the corresponding points), and topfive (topfivep1, then topfivep2) to parent environment.
+#' @export
+
 topfiveedges <- function(x,y){
   # calculating convex hull edge lengths
   hpts <- chull(x = x, y = y)

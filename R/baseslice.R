@@ -41,4 +41,5 @@ baseslice <- function(sample, filename, folder){
 
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
+  plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
 }

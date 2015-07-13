@@ -174,5 +174,9 @@ ramusslice <- function(sample, filename, folder){
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
   plot(leftside$x, leftside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
+  plot(leftside$y, leftside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
+  plot(leftside$x, leftside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
   plot(rightside$x, rightside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
+  plot(rightside$y, rightside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
+  plot(rightside$x, rightside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
 }
