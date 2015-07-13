@@ -4,7 +4,7 @@
 \alias{ramusslice}
 \title{Posterior Ramus Slice}
 \usage{
-ramusslice(sample, filename, folder, saveplots = TRUE, mandiblename)
+ramusslice(sample, filename, folder, saveplots = TRUE)
 }
 \arguments{
 \item{sample}{The input data frame. 3 named columns (x, y, and z, in that order).}
