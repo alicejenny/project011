@@ -80,7 +80,7 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
 
   # user input for yz rotation
   close(pb)
-  dev.new()
+  plot.new()
   par(mfrow=c(1,1))
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "yz rotation test", sep = " "), asp = 1)
   edgelength(finish$y, finish$z)
@@ -145,7 +145,7 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
   }
 
   # initial plots
-  dev.new()
+  plot.new()
   if (saveplots == TRUE){
     png(filename = paste(plotpath, mandiblename, "-aligned", ".png", sep = ""), width = 1000, height = 1000)
   }
@@ -173,16 +173,48 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     setWinProgressBar(pb, 2, label = paste("Slicing", mandiblename))
 
     # base
-    baseslice(finish, filename, folder, mandiblename)
+    plot.new()
+    par(mfrow=c(1,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-base", ".png", sep = ""), width = 1000, height = 1000)
+    }
+    baseslice(finish, filename, folder)
+    if (saveplots == TRUE){
+      dev.off()
+    }
 
     # gonial areas
-    gonialarea(finish, filename, folder, mandiblename)
+    plot.new()
+    par(mfrow=c(2,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-gonialarea", ".png", sep = ""), width = 1000, height = 1000)
+    }
+    gonialarea(finish, filename, folder)
+    if (saveplots == TRUE){
+      dev.off()
+    }
 
     # rami
+    plot.new()
+    par(mfrow=c(2,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-rami", ".png", sep = ""), width = 1000, height = 1000)
+    }
     ramusslice(finish, filename, folder, mandiblename)
+    if (saveplots == TRUE){
+      dev.off()
+    }
 
     # mental eminence
+    plot.new()
+    par(mfrow=c(1,3))
+    if (saveplots == TRUE){
+      png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
+    }
     menemslice(finish, filename, folder, mandiblename)
+    if (saveplots == TRUE){
+      dev.off()
+    }
   }
 
   # saving as an xyz file
