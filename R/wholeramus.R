@@ -7,8 +7,6 @@
 gonialarea <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
-  par(mfrow=c(1,1))
-  plot(sample$y, sample$z, asp = 1)
 
   msg <- paste("Isolating gonial area for mandible", str_replace(filename, "VERT", ""))
   message(msg)
