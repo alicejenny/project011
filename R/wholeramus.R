@@ -7,6 +7,8 @@
 gonialarea <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
+  par(mfrow=c(1,1))
+  plot(sample$y, sample$z, asp = 1)
 
   msg <- paste("Isolating gonial area for mandible", str_replace(filename, "VERT", ""))
   message(msg)
@@ -74,15 +76,18 @@ gonialarea <- function(sample, filename, folder){
   trquad <- trquad[ order(-trquad$y), ]
   toptwo <- trquad[1:2,]
   condyleR <- toptwo[which.max(toptwo$z),]
+  points(condyleR$y, condyleR$z, col = "purple", pch = 16)
 
   # ramus
   rhalf <- subset(topfive, y > 0)
   rhalf <- rhalf[ order(rhalf$z, rhalf$y), ]
   ramusB <- rhalf[2,]
+  points(ramusB$y, ramusB$z, col = "pink", pch = 16)
 
   # min y
-  top <- subset(sample, z >= max(sample$y))
-  ymin <- top[which.min(top$y),]
+  toprquad <- subset(sample, z >= max(sample$z)*0.75 & y > 0)
+  ymin <- toprquad[which.min(toprquad$y),]
+  points(ymin$y, ymin$z, col = "orange", pch = 16)
 
   ydiff <- condyleR$y[1] - ymin$y[1]
 

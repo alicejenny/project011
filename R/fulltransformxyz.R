@@ -12,7 +12,7 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   mandiblename <- str_replace(filename, "VERT", ".")
 
   # progress bar
-  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 12)
+  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 8)
 
   #empty objects
   src <- nrow(sample)
@@ -74,9 +74,48 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
     finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
   }
 
+  # user input for yz rotation
+  close(pb)
+  par(mfrow=c(1,1))
+  plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "yz rotation test", sep = " "), asp = 1)
+  edgelength(finish$y, finish$z)
+
+  n <- (as.numeric(readline("Rotation (degrees): ")) / 180)
+  rot <- n * pi
+  finish <- data.frame("x" = finish$x, "y" = (finish$y * cos(rot)) - (finish$z * sin(rot)), "z" = (finish$y * sin(rot)) + (finish$z * cos(rot)))
+
+  plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "yz rotated", sep = " "), asp = 1)
+  edgelength(finish$y, finish$z)
+
+  pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 8)
+
+  # running align again
+  # xy transform again
+  setWinProgressBar(pb, 1, label = paste("Transforming XY again for", mandiblename))
+  xytransform.res <- xytransform(finish)
+  xytransform.res <- centre(xytransform.res)
+
+  # yz align
+  setWinProgressBar(pb, 2, label = paste("Aligning YZ for", mandiblename))
+  yzalign.res <- yzalign(xytransform.res)
+  yzalign.res <- centre(yzalign.res)
+
+  # xz transform
+  setWinProgressBar(pb, 3, label = paste("Transforming XZ for", mandiblename))
+  xztransform.res <- xztransform(yzalign.res)
+  xztransform.res <- centre(xztransform.res)
+
+  finish <- xztransform.res
+
+  setWinProgressBar(pb, 4, label = paste("Checking orientation for", mandiblename))
+  xmax.y <- finish$y[which.max(finish$x)]
+  if (xmax.y < 0){
+    finish <- data.frame("x" = (finish$x * cos(pi)) - (finish$y * sin(pi)), "y" = (finish$x * sin(pi)) + (finish$y * cos(pi)), "z" = finish$z)
+  }
+
   # initial plots
   par(mfrow=c(2,3))
-  setWinProgressBar(pb, 10, label = paste("Plotting graphs for", mandiblename))
+  setWinProgressBar(pb, 5, label = paste("Plotting graphs for", mandiblename))
   plot(sample$x, sample$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "start xy", sep = " "), asp = 1)
   plot(sample$y, sample$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start yz", sep = " "), asp = 1)
   plot(sample$x, sample$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "start xz", sep = " "), asp = 1)
@@ -87,28 +126,28 @@ align2 <- function(sample, filename, folder, slice = TRUE) {
   edgelength(finish$y, finish$z)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "finish xz", sep = " "), asp = 1)
 
+  #returning to global environment
+  globname <- str_replace(filename, "VERT", ".al")
+  assign(globname, finish, envir = .GlobalEnv)
+
   # slicing
   if (slice == TRUE){
     par(mfrow=c(3,3))
-    setWinProgressBar(pb, 9, label = paste("Slicing", mandiblename))
+    setWinProgressBar(pb, 6, label = paste("Slicing", mandiblename))
     baseslice(finish, filename, folder)
     gonialarea(finish, filename, folder)
     ramusslice(finish, filename, folder)
     menemslice(finish, filename, folder)
   }
 
-  #returning to global environment
-  globname <- str_replace(filename, "VERT", ".al")
-  assign(globname, finish, envir = .GlobalEnv)
-
   # saving as an xyz file
-  setWinProgressBar(pb, 11, label = paste("Writing", mandiblename, "to file"))
+  setWinProgressBar(pb, 7, label = paste("Writing", mandiblename, "to file"))
   fullfile <- paste(str_replace(filename, "VERT", "-aligned"), ".xyz", sep = "")
   fileandpath <- paste(folder, fullfile, sep = "//")
   write.table(finish, fileandpath, row.names = FALSE, col.names = FALSE)
 
   # closing progress bar
-  setWinProgressBar(pb, 12)
+  setWinProgressBar(pb, 8)
   close(pb)
 
   # calculating change made
