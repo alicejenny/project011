@@ -4,7 +4,7 @@
 \alias{baseslice}
 \title{Isolate the base}
 \usage{
-baseslice(sample, filename, folder)
+baseslice(sample, filename, folder, saveplots = TRUE)
 }
 \description{
 Slices off the base (xmin + 10%), inverts it, and culls backfaces. Saves as a txt.

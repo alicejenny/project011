@@ -173,48 +173,16 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     setWinProgressBar(pb, 2, label = paste("Slicing", mandiblename))
 
     # base
-    dev.new()
-    par(mfrow=c(1,3))
-    if (saveplots == TRUE){
-      png(filename = paste(plotpath, mandiblename, "-base", ".png", sep = ""), width = 1000, height = 1000)
-    }
     baseslice(finish, filename, folder)
-    if (saveplots == TRUE){
-      dev.off()
-    }
 
     # gonial areas
-    dev.new()
-    par(mfrow=c(2,3))
-    if (saveplots == TRUE){
-      png(filename = paste(plotpath, mandiblename, "-gonialarea", ".png", sep = ""), width = 1000, height = 1000)
-    }
     gonialarea(finish, filename, folder)
-    if (saveplots == TRUE){
-      dev.off()
-    }
 
     # rami
-    dev.new()
-    par(mfrow=c(2,3))
-    if (saveplots == TRUE){
-      png(filename = paste(plotpath, mandiblename, "-rami", ".png", sep = ""), width = 1000, height = 1000)
-    }
     ramusslice(finish, filename, folder)
-    if (saveplots == TRUE){
-      dev.off()
-    }
 
     # mental eminence
-    dev.new()
-    par(mfrow=c(1,3))
-    if (saveplots == TRUE){
-      png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
-    }
     menemslice(finish, filename, folder)
-    if (saveplots == TRUE){
-      dev.off()
-    }
   }
 
   # saving as an xyz file

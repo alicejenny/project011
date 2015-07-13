@@ -3,7 +3,7 @@
 #' Slices off the base (xmin + 10%), inverts it, and culls backfaces. Saves as a txt.
 #' @export
 
-baseslice <- function(sample, filename, folder){
+baseslice <- function(sample, filename, folder, saveplots = TRUE){
   require(Morpho)
   require(Rvcg)
 
@@ -39,7 +39,24 @@ baseslice <- function(sample, filename, folder){
   writeData(wb, shortname, finish, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
+  # plot save info
+  plotpath <- paste(folder, "plots\\", sep = "\\")
+  if (dir.exists(plotpath) == FALSE){
+    dir.create(plotpath)
+  }
+
+  dev.new()
+  par(mfrow=c(1,3))
+  if (saveplots == TRUE){
+    png(filename = paste(plotpath, mandiblename, "-base", ".png", sep = ""), width = 1000, height = 1000)
+  }
+
   plot(finish$x, finish$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
   plot(finish$y, finish$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
   plot(finish$x, finish$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "base", sep = " "), asp = 1)
+
+
+  if (saveplots == TRUE){
+    dev.off()
+  }
 }

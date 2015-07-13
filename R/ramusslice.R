@@ -4,7 +4,7 @@
 #' @param sample The input data frame. 3 named columns (x, y, and z, in that order).
 #' @export
 
-ramusslice <- function(sample, filename, folder){
+ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   require(Morpho)
   require(Rvcg)
 
@@ -173,10 +173,26 @@ ramusslice <- function(sample, filename, folder){
   writeData(wb, shortname, rightside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
+  # plot save info
+  plotpath <- paste(folder, "plots\\", sep = "\\")
+  if (dir.exists(plotpath) == FALSE){
+    dir.create(plotpath)
+  }
+
+  dev.new()
+  par(mfrow=c(2,3))
+  if (saveplots == TRUE){
+    png(filename = paste(plotpath, mandiblename, "-rami", ".png", sep = ""), width = 1000, height = 1000)
+  }
+
   plot(leftside$x, leftside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
   plot(leftside$y, leftside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
   plot(leftside$x, leftside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "left ramus", sep = " "), asp = 1)
   plot(rightside$x, rightside$y, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
   plot(rightside$y, rightside$z, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
   plot(rightside$x, rightside$z, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "right ramus", sep = " "), asp = 1)
+
+  if (saveplots == TRUE){
+    dev.off()
+  }
 }

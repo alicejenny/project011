@@ -4,7 +4,7 @@
 #' @param sample The input data frame. 3 named columns (x, y, and z, in that order).
 #' @export
 
-menemslice <- function(sample, filename, folder){
+menemslice <- function(sample, filename, folder, saveplots = TRUE){
   require(Morpho)
   require(Rvcg)
 
@@ -77,7 +77,23 @@ menemslice <- function(sample, filename, folder){
   writeData(wb, shortname, menemfin, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
+  # plot save info
+  plotpath <- paste(folder, "plots\\", sep = "\\")
+  if (dir.exists(plotpath) == FALSE){
+    dir.create(plotpath)
+  }
+
+  dev.new()
+  par(mfrow=c(1,3))
+  if (saveplots == TRUE){
+    png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
+  }
+
   plot(menemfin$x, menemfin$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
   plot(menemfin$y, menemfin$z, asp = 1, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
   plot(menemfin$x, menemfin$z, asp = 1, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+
+  if (saveplots == TRUE){
+    dev.off()
+  }
 }
