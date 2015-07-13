@@ -173,16 +173,16 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     setWinProgressBar(pb, 2, label = paste("Slicing", mandiblename))
 
     # base
-    baseslice(finish, filename, folder)
+    baseslice(finish, filename, folder, mandiblename)
 
     # gonial areas
-    gonialarea(finish, filename, folder)
+    gonialarea(finish, filename, folder, mandiblename)
 
     # rami
-    ramusslice(finish, filename, folder)
+    ramusslice(finish, filename, folder, mandiblename)
 
     # mental eminence
-    menemslice(finish, filename, folder)
+    menemslice(finish, filename, folder, mandiblename)
   }
 
   # saving as an xyz file

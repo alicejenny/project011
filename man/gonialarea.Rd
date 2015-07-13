@@ -4,7 +4,7 @@
 \alias{gonialarea}
 \title{Gonial Area Slice}
 \usage{
-gonialarea(sample, filename, folder, saveplots = TRUE)
+gonialarea(sample, filename, folder, saveplots = TRUE, mandiblename)
 }
 \arguments{
 \item{sample}{The input data frame. 3 named columns (x, y, and z, in that order).}

@@ -4,7 +4,7 @@
 \alias{menemslice}
 \title{Mental Eminence Slice}
 \usage{
-menemslice(sample, filename, folder, saveplots = TRUE)
+menemslice(sample, filename, folder, saveplots = TRUE, mandiblename)
 }
 \arguments{
 \item{sample}{The input data frame. 3 named columns (x, y, and z, in that order).}

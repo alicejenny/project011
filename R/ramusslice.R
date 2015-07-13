@@ -4,7 +4,7 @@
 #' @param sample The input data frame. 3 named columns (x, y, and z, in that order).
 #' @export
 
-ramusslice <- function(sample, filename, folder, saveplots = TRUE){
+ramusslice <- function(sample, filename, folder, saveplots = TRUE, mandiblename){
   require(Morpho)
   require(Rvcg)
 

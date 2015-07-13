@@ -3,7 +3,7 @@
 #' Slices off the base (xmin + 10%), inverts it, and culls backfaces. Saves as a txt.
 #' @export
 
-baseslice <- function(sample, filename, folder, saveplots = TRUE){
+baseslice <- function(sample, filename, folder, saveplots = TRUE, mandiblename){
   require(Morpho)
   require(Rvcg)
 
