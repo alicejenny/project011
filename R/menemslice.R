@@ -83,7 +83,7 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE, mandiblename)
     dir.create(plotpath)
   }
 
-  dev.new()
+  plot.new()
   par(mfrow=c(1,3))
   if (saveplots == TRUE){
     png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
