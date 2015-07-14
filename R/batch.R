@@ -7,6 +7,8 @@
 #' @examples batch()
 
 batch <- function(align = TRUE, slice = TRUE){
+  require(stringr)
+
   if (align == FALSE){
     slice <- FALSE
   }
