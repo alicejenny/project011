@@ -91,13 +91,16 @@ batch <- function(align = TRUE, slice = TRUE){
     for (i in 1:length(impfiles)){
       obj <- get(impfiles[i], envir = vertenv)
       fn <- impfiles[i]
-      align2(sample = obj, filename = fn, folder = savedir, slice = slice)
-      resFrame$saved.as[i] <- as.character(returnlist$saved.as[1])
-      resFrame$runtime[i] <- as.character(returnlist$runtime[1])
-      resFrame$loops[i] <- as.integer(returnlist$loops[1])
-      resFrame$x.diff[i] <- as.integer(returnlist$x.diff[1])
-      resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
-      resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
+      shortname <- str_replace(fn, "VERT", "")
+      tryCatch({
+        align2(sample = obj, filename = fn, folder = savedir, slice = slice)
+        resFrame$saved.as[i] <- as.character(returnlist$saved.as[1])
+        resFrame$runtime[i] <- as.character(returnlist$runtime[1])
+        resFrame$loops[i] <- as.integer(returnlist$loops[1])
+        resFrame$x.diff[i] <- as.integer(returnlist$x.diff[1])
+        resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
+        resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
+      }, error=function(e){message("ERROR IN MANDIBLE ", shortname, ": ", conditionMessage(e))})
     }
 
     print(resFrame)
