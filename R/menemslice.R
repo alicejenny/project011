@@ -40,10 +40,17 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
   # rotate
   rad <- pi * 1.5
   menemrot <- data.frame("x" = menem$x, "y" = (menem$y * cos(rad)) - (menem$z * sin(rad)), "z" = (menem$y * sin(rad)) + (menem$z * cos(rad)))
+  plot(menemrot$x, menemrot$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+  edgelength(menemrot$x, menemrot$y)
+  plot(menemrot$y, menemrot$z, asp = 1, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+  plot(menemrot$x, menemrot$z, asp = 1, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+
 
   # remove teeth
   topfiveedges(menemrot$x, menemrot$y)
-  top5tophalf <- subset(topfive, y > (max(menemrot$y) * 0.75))
+  #top5tophalf <- subset(topfive, y > (max(menemrot$y) * 0.75))
+  top5tophalf <- topfive[ order(-topfive$y, topfive$x),]
+  top5tophalf <- top5tophalf[1:5,]
   # xmin top
   xmintop <- top5tophalf[which.min(top5tophalf$x),]
   # xmax top
@@ -67,6 +74,7 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
   plot(menemfin$x, menemfin$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+  edgelength(menemfin$x, menemfin$y)
   plot(menemfin$y, menemfin$z, asp = 1, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
   plot(menemfin$x, menemfin$z, asp = 1, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
 }
