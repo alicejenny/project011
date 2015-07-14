@@ -11,60 +11,15 @@ ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   msg <- paste("Isolating posterior ramus for mandible", str_replace(filename, "VERT", ""))
   message(msg)
 
+  left <- subset(sample, x >= 0)
+  right <- subset(sample, x < 0)
+
+  # LEFT
   # calculating convex hull edge lengths
-  hpts <- chull(x = sample$y, y = sample$z)
-  hf <- data.frame("y" = sample$y[hpts], "z" = sample$z[hpts])
-  npts <- nrow(hf)
-  dist <- data.frame("dist" = numeric(npts), "p1y" = numeric(npts), "p1z" = numeric(npts), "p2y" = numeric(npts), "p2z" = numeric(npts))
-  for (i in 1:npts){
-    if (i != npts){
-      a <- abs(hf$y[i] - hf$y[i+1])
-      b <- abs(hf$z[i] - hf$z[i+1])
-      dist$p1y[i] <- hf$y[i]
-      dist$p2y[i] <- hf$y[i+1]
-      dist$p1z[i] <- hf$z[i]
-      dist$p2z[i] <- hf$z[i+1]
-    }
-    else {
-      a <- abs(hf$y[i] - hf$y[1])
-      b <- abs(hf$z[i] - hf$z[1])
-      dist$p1y[i] <- hf$y[i]
-      dist$p2y[i] <- hf$y[1]
-      dist$p1z[i] <- hf$z[i]
-      dist$p2z[i] <- hf$z[1]
-    }
-
-    c2 <- (a^2) + (b^2)
-    c <- sqrt(c2)
-    dist$dist[i] <- c
-  }
-
-  sorted <- dist[ order(-dist$dist, dist$p1y, dist$p2y), ]
-
-  #longest
-  one <- data.frame("y" = c(sorted$p1y[1],sorted$p2y[1]), "z" = c(sorted$p1z[1], sorted$p2z[1]))
-  one <- one[ order(one$z, one$y), ]
-
-  # second longest
-  two <- data.frame("y" = c(sorted$p1y[2],sorted$p2y[2]), "z" = c(sorted$p1z[2], sorted$p2z[2]))
-  two <- two[ order(two$z, two$y), ]
-
-  # third longest
-  three <- data.frame("y" = c(sorted$p1y[3],sorted$p2y[3]), "z" = c(sorted$p1z[3], sorted$p2z[3]))
-  three <- three[ order(three$z, three$y), ]
-
-  # fourth longest
-  four <- data.frame("y" = c(sorted$p1y[4],sorted$p2y[4]), "z" = c(sorted$p1z[4], sorted$p2z[4]))
-  four <- four[ order(four$z, four$y), ]
-
-  # fifth longest
-  five <- data.frame("y" = c(sorted$p1y[5],sorted$p2y[5]), "z" = c(sorted$p1z[5], sorted$p2z[5]))
-  five <- five[ order(five$z, five$y), ]
-
-  # top five
-  topfivep1 <- rbind(one[1,],two[1,],three[1,],four[1,],five[1,])
-  topfivep2 <- rbind(one[2,],two[2,],three[2,],four[2,],five[2,])
-  topfive <- rbind(topfivep1, topfivep2)
+  topfiveedges(left$y, left$z)
+  topfive <- data.frame("y" = topfive$x, "z" = topfive$y)
+  topfivep1 <- data.frame("y" = topfivep1$x, "z" = topfivep1$y)
+  topfivep2 <- data.frame("y" = topfivep2$x, "z" = topfivep2$y)
 
   # base
   minz <- which.min(topfivep1$z)
@@ -87,15 +42,14 @@ ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   c <- condyleR[1,2] - (slp * condyleR[1,1])
 
   # slice
-  ramus <- subset(sample, z < (slp*y) + c)
+  ramus <- subset(left, z < (slp*y) + c)
 
   # rotate
   rad <- pi - atan(slp)
   ramusrot <- data.frame("x" = ramus$x, "y" = (ramus$y * cos(rad)) - (ramus$z * sin(rad)), "z" = (ramus$y * sin(rad)) + (ramus$z * cos(rad)))
 
   # left side
-  leftside <- subset(ramusrot, x > 0)
-  centre(leftside)
+  leftside <- centre(ramusrot)
 
   ymin.y <- min(leftside$y)
   ymin.x <- leftside$x[which.min(leftside$y)]
@@ -133,9 +87,42 @@ ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   writeData(wb, shortname, leftside, colNames = TRUE, rowNames = FALSE)
   saveWorkbook(wb, fileandpath, overwrite = TRUE)
 
+  #RIGHT
+  # calculating convex hull edge lengths
+  topfiveedges(right$y, right$z)
+  topfive <- data.frame("y" = topfive$x, "z" = topfive$y)
+  topfivep1 <- data.frame("y" = topfivep1$x, "z" = topfivep1$y)
+  topfivep2 <- data.frame("y" = topfivep2$x, "z" = topfivep2$y)
+
+  # base
+  minz <- which.min(topfivep1$z)
+  base <- rbind(topfivep1[minz,],topfivep2[minz,])
+  baseR <- base[which.max(base$y),]
+
+  # condyle
+  zmax <- max(topfive$z)
+  trquad <- subset(topfive, y > 0 & z > (zmax/2))
+  trquad <- trquad[ order(-trquad$y), ]
+  toptwo <- trquad[1:2,]
+  condyleR <- toptwo[which.max(toptwo$z),]
+
+  # find slope
+  slp.ypoints <- c(condyleR[1,1], baseR[1,1])
+  slp.zpoints <- c(condyleR[1,2], baseR[1,2])
+  slp <- diff(slp.zpoints)/diff(slp.ypoints)
+
+  # find y intercept
+  c <- condyleR[1,2] - (slp * condyleR[1,1])
+
+  # slice
+  ramus <- subset(right, z < (slp*y) + c)
+
+  # rotate
+  rad <- pi - atan(slp)
+  ramusrot <- data.frame("x" = ramus$x, "y" = (ramus$y * cos(rad)) - (ramus$z * sin(rad)), "z" = (ramus$y * sin(rad)) + (ramus$z * cos(rad)))
+
   # right side
-  rightside <- subset(ramusrot, x < 0)
-  centre(rightside)
+  rightside <- centre(ramusrot)
 
   ymin.y <- min(rightside$y)
   ymin.x <- rightside$x[which.min(rightside$y)]
@@ -144,7 +131,7 @@ ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   slp.ypoints <- c(ymin.y, ymax.y)
   slp.xpoints <- c(ymin.x, ymax.x)
   slp <- diff(slp.ypoints)/diff(slp.xpoints)
-  rad <- pi*1.5 - atan(slp)
+  rad <- pi/2 - atan(slp)
   rightside <- data.frame("x" = (rightside$x * cos(rad)) - (rightside$y * sin(rad)), "y" = (rightside$x * sin(rad)) + (rightside$y * cos(rad)), "z" = rightside$z)
 
   # backface culling (right)
