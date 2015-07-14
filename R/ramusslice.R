@@ -62,18 +62,7 @@ ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   leftside <- data.frame("x" = (leftside$x * cos(rad)) - (leftside$y * sin(rad)), "y" = (leftside$x * sin(rad)) + (leftside$y * cos(rad)), "z" = leftside$z)
 
   # backface culling (left)
-  mat <- as.matrix(leftside)
-  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
-  normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
-  sixcol <- cbind(leftside, normdf)
-  if (sixcol$zn[which.max(sixcol$z)] < 0){
-    culled <- subset(sixcol, zn <= 0)
-  }
-
-  else {
-    culled <- subset(sixcol, zn >= 0)
-  }
-  leftside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
+  leftside <- bfcull(leftside)
 
   # saving left
   shortname <- str_replace(filename, "VERT", "-ramusL")
@@ -135,18 +124,7 @@ ramusslice <- function(sample, filename, folder, saveplots = TRUE){
   rightside <- data.frame("x" = (rightside$x * cos(rad)) - (rightside$y * sin(rad)), "y" = (rightside$x * sin(rad)) + (rightside$y * cos(rad)), "z" = rightside$z)
 
   # backface culling (right)
-  mat <- as.matrix(rightside)
-  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
-  normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
-  sixcol <- cbind(rightside, normdf)
-  if (sixcol$zn[which.max(sixcol$z)] < 0){
-    culled <- subset(sixcol, zn <= 0)
-  }
-
-  else {
-    culled <- subset(sixcol, zn >= 0)
-  }
-  rightside <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
+  rightside <- bfcull(rightside)
 
   # saving right
   shortname <- str_replace(filename, "VERT", "-ramusR")

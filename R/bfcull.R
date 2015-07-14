@@ -1,3 +1,8 @@
+#' Cull backfaces
+#'
+#' Deletes vertices pointing downwards.
+#' @export
+
 bfcull <- function(sample){
   mat <- as.matrix(sample)
   normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals

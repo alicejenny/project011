@@ -25,13 +25,13 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
   }
 
   # isolate base
-  base <- subset(sample, z <= chintop$z[1])
+  base <- sample
 
   # centre
   cenbase <- data.frame("x" = base$x, "y" = base$y - chintop$y[1], "z" = base$z)
 
   # 10%
-  yrange <- max(base$y) - chintop$y[1]
+  yrange <- max(cenbase$y) - min(cenbase$y)
   tenpc <- yrange * 0.1
 
   # slice
@@ -52,18 +52,7 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
   menem.noteeth <- subset(menemrot, y < min(xmintop$y[1], xmaxtop$y[1]))
 
   # backface culling
-  mat <- as.matrix(menem.noteeth)
-  normals <- vcgUpdateNormals(mat, type = 0, pointcloud = c(10,0), silent = TRUE)$normals
-  normdf <- data.frame("xn" = c(normals[1,]), "yn" = c(normals[2,]), "zn" = c(normals[3,]))
-  sixcol <- cbind(menem.noteeth, normdf)
-  if (sixcol$zn[which.max(sixcol$z)] < 0){
-    culled <- subset(sixcol, zn <= 0)
-  }
-
-  else {
-    culled <- subset(sixcol, zn >= 0)
-  }
-  menemfin <- data.frame("x" = culled$x, "y" = culled$y, "z" = culled$z)
+  menemfin <- bfcull(menem.noteeth)
 
   # saving
   shortname <- str_replace(filename, "VERT", "-menem")
