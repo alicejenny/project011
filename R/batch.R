@@ -6,7 +6,7 @@
 #' @export
 #' @examples batch()
 
-batch <- function(align = TRUE, slice = TRUE){
+batch <- function(align = TRUE, slice = TRUE, folder = choose.dir(caption = "Select Save Folder")){
   require(stringr)
 
   if (align == FALSE){
@@ -86,10 +86,10 @@ batch <- function(align = TRUE, slice = TRUE){
 
   if (align == TRUE){
 
-    savedir <- choose.dir(default = getwd(), caption = "Select Save Folder")
+    savedir <- folder
     impfiles <- ls(vertenv)
     resFrame <- data.frame("saved.as" = numeric(length(impfiles)), "runtime" = numeric(length(impfiles)), "loops" = numeric(length(impfiles)), "x.diff" = numeric(length(impfiles)), "y.diff" = numeric(length(impfiles)), "z.diff" = numeric(length(impfiles)))
-    errList <- data.frame("INCOMPLETE:" = numeric(0))
+    errList <- data.frame()
 
     for (i in 1:length(impfiles)){
       obj <- get(impfiles[i], envir = vertenv)
@@ -104,14 +104,23 @@ batch <- function(align = TRUE, slice = TRUE){
         resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
         resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
       }, error=function(e){
-        message("ERROR IN MANDIBLE ", shortname, ": ", conditionCall(e))
-        errList[length(errList) + 1] <- shortname
+        message("ERROR IN MANDIBLE ", shortname, ": ", conditionMessage(e))
+        }, finally = {
+          errList <- rbind(errList, shortname)
         })
       pcdone <- round((i/length(impfiles))*100)
       pcdonemsg <- paste(pcdone, "% done.", sep = "")
       message(pcdonemsg)
     }
-    print(resFrame)
+    resFrame <- subset(resFrame, saved.as != 0)
+    if (sum(resFrame$saved.as == 0) > 0){
+      print(resFrame)
+    }
+
+    if (length(errList) > 0){
+      errList <- data.frame("INCOMPLETE" = errList[,1])
+      print(errList)
+    }
   }
 
   endTime <- Sys.time()
