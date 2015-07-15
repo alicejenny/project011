@@ -40,23 +40,35 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
   # rotate
   rad <- pi * 1.5
   menemrot <- data.frame("x" = menem$x, "y" = (menem$y * cos(rad)) - (menem$z * sin(rad)), "z" = (menem$y * sin(rad)) + (menem$z * cos(rad)))
-  plot(menemrot$x, menemrot$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
-  edgelength(menemrot$x, menemrot$y)
-  plot(menemrot$y, menemrot$z, asp = 1, xlab = "y", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
-  plot(menemrot$x, menemrot$z, asp = 1, xlab = "x", ylab = "z", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
 
+  # align
+  leftme <- subset(menemrot, x > 0)
+  rightme <- subset(menemrot, x < 0)
+  rmin.y <- min(rightme$y)
+  rmin.x <- rightme$x[which.min(rightme$y)]
+  lmin.y <- min(leftme$y)
+  lmin.x <- leftme$x[which.min(leftme$y)]
+  slp.xpoints <- c(rmin.x, lmin.x)
+  slp.ypoints <- c(rmin.y, lmin.y)
+  slp <- diff(slp.ypoints)/diff(slp.xpoints)
+  rad <- 2*pi - atan(slp)
+  menemrot <- data.frame("x" = (menemrot$x * cos(rad)) - (menemrot$y * sin(rad)), "y" = (menemrot$x * sin(rad)) + (menemrot$y * cos(rad)), "z" = menemrot$z)
 
   # remove teeth
   topfiveedges(menemrot$x, menemrot$y)
-  #top5tophalf <- subset(topfive, y > (max(menemrot$y) * 0.75))
-  top5tophalf <- topfive[ order(-topfive$y, topfive$x),]
-  top5tophalf <- top5tophalf[1:5,]
-  # xmin top
-  xmintop <- top5tophalf[which.min(top5tophalf$x),]
-  # xmax top
-  xmaxtop <- top5tophalf[which.max(top5tophalf$x),]
-  # lowest y
-  menem.noteeth <- subset(menemrot, y < min(xmintop$y[1], xmaxtop$y[1]))
+  teeth.removed <- "N"
+  while(teeth.removed == "N"){
+    plot.new()
+    par(mfrow=c(1,1))
+    plot(menemrot$x, menemrot$y, asp = 1)
+    points(topfive, col = "red", pch = 16)
+    text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
+    menem.noteeth <- subset(menemrot, y < topfive$y[as.integer(readline("Which point? "))])
+    plot(menem.noteeth$x, menem.noteeth$y, asp = 1)
+    teeth.removed <- readline("Okay to continue? (Y/N): ")
+    dev.off()
+  }
+  par(mfrow=c(2,3))
 
   # backface culling
   menemfin <- bfcull(menem.noteeth)
