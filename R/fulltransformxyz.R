@@ -212,7 +212,7 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     menemslicept1(finish, filename)
     topfiveedges(menempt1$x, menempt1$y)
     teeth.removed <- "R"
-    while(teeth.removed == "R"){
+    while(teeth.removed == "R" | teeth.removed == "r"){
       plot.new()
       par(mfrow=c(1,1))
       plot(menempt1$x, menempt1$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
@@ -229,10 +229,10 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
       }
       dev.off()
     }
-    while (teeth.removed == "A"){
+    while (teeth.removed == "A" | teeth.removed == "a"){
       teeth.removed <- "R"
       topfiveedges(menem.noteeth$x, menem.noteeth$y)
-      while(teeth.removed == "R"){
+      while(teeth.removed == "R" | teeth.removed == "r"){
         plot.new()
         par(mfrow=c(1,1))
         plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
@@ -255,7 +255,7 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     }
     plot.new()
     par(mfrow=c(1,3))
-    menemslicept2(menempt1, filename, folder)
+    menemslicept2(menem.noteeth, filename, folder)
     if (saveplots == TRUE){
       dev.off()
     }
