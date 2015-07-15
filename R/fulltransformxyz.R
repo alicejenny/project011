@@ -218,14 +218,21 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
       plot(menempt1$x, menempt1$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
       points(topfive, col = "red", pch = 16)
       text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
-      cutpoint <- as.integer(readline("Above which point should be discarded? (0 for none): "))
+      input <- readline("Above which point should be discarded? (0 for none, M[y-value] for manual setting of the upper y value): ")
+      if (sum(input == c(1:nrow(topfive))) > 0){
+        cutpoint <- topfive$y[as.integer(input)]
+      }
+      else {
+        cutpoint <- as.numeric(str_replace(input, "M", ""))
+      }
       if (cutpoint != 0){
-        menem.noteeth <- subset(menempt1, y < topfive$y[cutpoint])
+        menem.noteeth <- subset(menempt1, y < cutpoint)
         plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
-        teeth.removed <- readline("Okay to continue? (Y [yes]/R [restart]/A [again]: ")
+        teeth.removed <- readline("Okay to continue? (Y [yes]/R [restart]/A [again]): ")
       }
       if (cutpoint == 0){
         teeth.removed <- "Y"
+        menem.noteeth <- menempt1
       }
       dev.off()
     }
@@ -238,9 +245,15 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
         plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
         points(topfive, col = "red", pch = 16)
         text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
-        cutpoint <- as.integer(readline("Above which point should be discarded? (0 for none): "))
+        input <- readline("Above which point should be discarded? (0 for none, M[y-value] for manual setting of the upper y value): ")
+        if (sum(input == c(1:nrow(topfive))) > 0){
+          cutpoint <- topfive$y[as.integer(input)]
+        }
+        else {
+          cutpoint <- as.numeric(str_replace(input, "M", ""))
+        }
         if (cutpoint != 0){
-          menem.noteeth <- subset(menem.noteeth, y < topfive$y[cutpoint])
+          menem.noteeth <- subset(menempt1, y < cutpoint)
           plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
           teeth.removed <- readline("Okay to continue? (Y [yes]/R [restart]/A [again]): ")
         }

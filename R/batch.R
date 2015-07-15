@@ -89,6 +89,7 @@ batch <- function(align = TRUE, slice = TRUE){
     savedir <- choose.dir(default = getwd(), caption = "Select Save Folder")
     impfiles <- ls(vertenv)
     resFrame <- data.frame("saved.as" = numeric(length(impfiles)), "runtime" = numeric(length(impfiles)), "loops" = numeric(length(impfiles)), "x.diff" = numeric(length(impfiles)), "y.diff" = numeric(length(impfiles)), "z.diff" = numeric(length(impfiles)))
+    errList <- data.frame("INCOMPLETE:" = numeric(0))
 
     for (i in 1:length(impfiles)){
       obj <- get(impfiles[i], envir = vertenv)
@@ -102,9 +103,14 @@ batch <- function(align = TRUE, slice = TRUE){
         resFrame$x.diff[i] <- as.integer(returnlist$x.diff[1])
         resFrame$y.diff[i] <- as.integer(returnlist$y.diff[1])
         resFrame$z.diff[i] <- as.integer(returnlist$z.diff[1])
-      }, error=function(e){message("ERROR IN MANDIBLE ", shortname, ": ", conditionMessage(e))})
+      }, error=function(e){
+        message("ERROR IN MANDIBLE ", shortname, ": ", conditionCall(e))
+        errList[length(errList) + 1] <- shortname
+        })
+      pcdone <- round((i/length(impfiles))*100)
+      pcdonemsg <- paste(pcdone, "% done.", sep = "")
+      message(pcdonemsg)
     }
-
     print(resFrame)
   }
 
