@@ -14,6 +14,8 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
   # start time for calculating run time
   starttime <- Sys.time()
   mandiblename <- str_replace(filename, "VERT", "")
+  msg <- paste("Starting mandible", mandiblename)
+  message(msg)
 
   # progress bar
   pb <- winProgressBar(title = "Aligning...", label = "Initialising...", max = 8)
@@ -206,19 +208,47 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     }
 
     # mental eminence
+    close(pb)
     menemslicept1(finish, filename)
     topfiveedges(menempt1$x, menempt1$y)
-    teeth.removed <- "N"
-    while(teeth.removed == "N"){
+    teeth.removed <- "R"
+    while(teeth.removed == "R"){
       plot.new()
       par(mfrow=c(1,1))
       plot(menempt1$x, menempt1$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
       points(topfive, col = "red", pch = 16)
       text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
-      menem.noteeth <- subset(menempt1, y < topfive$y[as.integer(readline("Above which point should be discarded? "))])
-      plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
-      teeth.removed <- readline("Okay to continue? (Y/N): ")
+      cutpoint <- as.integer(readline("Above which point should be discarded? (0 for none): "))
+      if (cutpoint != 0){
+        menem.noteeth <- subset(menempt1, y < topfive$y[cutpoint])
+        plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+        teeth.removed <- readline("Okay to continue? (Y [yes]/R [restart]/A [again]: ")
+      }
+      if (cutpoint == 0){
+        teeth.removed <- "Y"
+      }
       dev.off()
+    }
+    while (teeth.removed == "A"){
+      teeth.removed <- "R"
+      topfiveedges(menem.noteeth$x, menem.noteeth$y)
+      while(teeth.removed == "R"){
+        plot.new()
+        par(mfrow=c(1,1))
+        plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+        points(topfive, col = "red", pch = 16)
+        text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
+        cutpoint <- as.integer(readline("Above which point should be discarded? (0 for none): "))
+        if (cutpoint != 0){
+          menem.noteeth <- subset(menem.noteeth, y < topfive$y[cutpoint])
+          plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+          teeth.removed <- readline("Okay to continue? (Y [yes]/R [restart]/A [again]): ")
+        }
+        if (cutpoint == 0){
+          teeth.removed <- "Y"
+        }
+        dev.off()
+      }
     }
     if (saveplots == TRUE){
       png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
@@ -259,6 +289,6 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
   returnlist <- data.frame("saved.as" = fullfile, "runtime" = runtime, "loops" = l, "x.diff" = as.integer(unlist(strsplit(changemade[1], " "))[6]), "y.diff" = as.integer(unlist(strsplit(changemade[2], " "))[6]), "z.diff" = as.integer(unlist(strsplit(changemade[3], " "))[6]))
   assign("returnlist", returnlist, envir = parent.frame())
 
-  msg <- paste("Finished mandible", str_replace(filename, "VERT", ""))
+  msg <- paste("Finished mandible", mandiblename)
   message(msg)
 }
