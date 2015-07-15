@@ -206,6 +206,7 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     }
 
     # mental eminence
+    close(pb)
     if (saveplots == TRUE){
       png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
     }
@@ -215,6 +216,7 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     if (saveplots == TRUE){
       dev.off()
     }
+    pb <- winProgressBar(title = "Finishing up...", label = "Initialising...", max = 4, initial = 3)
   }
 
   # saving as an xyz file

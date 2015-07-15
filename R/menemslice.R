@@ -58,7 +58,7 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
   topfiveedges(menemrot$x, menemrot$y)
   teeth.removed <- "N"
   while(teeth.removed == "N"){
-    plot.new()
+    dev.new()
     par(mfrow=c(1,1))
     plot(menemrot$x, menemrot$y, asp = 1)
     points(topfive, col = "red", pch = 16)
@@ -66,8 +66,8 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
     menem.noteeth <- subset(menemrot, y < topfive$y[as.integer(readline("Which point? "))])
     plot(menem.noteeth$x, menem.noteeth$y, asp = 1)
     teeth.removed <- readline("Okay to continue? (Y/N): ")
-    dev.off()
   }
+  dev.off()
   par(mfrow=c(2,3))
 
   # backface culling
