@@ -64,7 +64,7 @@ menemslice <- function(sample, filename, folder, saveplots = TRUE){
     points(topfive, col = "red", pch = 16)
     text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
     menem.noteeth <- subset(menemrot, y < topfive$y[as.integer(readline("Above which point should be discarded? "))])
-    plot(menem.noteeth$x, menem.noteeth$y, asp = 1)
+    plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
     teeth.removed <- readline("Okay to continue? (Y/N): ")
   }
   dev.off()
