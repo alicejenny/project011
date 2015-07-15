@@ -200,19 +200,32 @@ align2 <- function(sample, filename, folder, slice = TRUE, saveplots = TRUE) {
     }
     plot.new()
     par(mfrow=c(2,3))
-    ramusslice(finish, filename, folder, mandiblename)
+    ramusslice(finish, filename, folder)
     if (saveplots == TRUE){
       dev.off()
     }
 
     # mental eminence
-    close(pb)
+    menemslicept1(finish, filename)
+    topfiveedges(menempt1$x, menempt1$y)
+    teeth.removed <- "N"
+    while(teeth.removed == "N"){
+      plot.new()
+      par(mfrow=c(1,1))
+      plot(menempt1$x, menempt1$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+      points(topfive, col = "red", pch = 16)
+      text(topfive, labels = c(1:nrow(topfive)), pos = 2, col = "blue")
+      menem.noteeth <- subset(menempt1, y < topfive$y[as.integer(readline("Above which point should be discarded? "))])
+      plot(menem.noteeth$x, menem.noteeth$y, asp = 1, xlab = "x", ylab = "y", main = paste(str_replace(filename, "VERT", ""), "mental eminence", sep = " "))
+      teeth.removed <- readline("Okay to continue? (Y/N): ")
+      dev.off()
+    }
     if (saveplots == TRUE){
       png(filename = paste(plotpath, mandiblename, "-menem", ".png", sep = ""), width = 1000, height = 1000)
     }
     plot.new()
     par(mfrow=c(1,3))
-    menemslice(finish, filename, folder, mandiblename)
+    menemslicept2(menempt1, filename, folder)
     if (saveplots == TRUE){
       dev.off()
     }

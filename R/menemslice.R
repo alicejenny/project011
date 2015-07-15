@@ -4,7 +4,7 @@
 #' @param sample The input data frame. 3 named columns (x, y, and z, in that order).
 #' @export
 
-menemslice <- function(sample, filename, folder, saveplots = TRUE){
+menemslice <- function(sample, filename, folder){
   require(Morpho)
   require(Rvcg)
 
